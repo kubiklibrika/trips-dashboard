@@ -10,12 +10,15 @@
  * - Color-coded cards by participant count
  * - Data loaded from Google Drive API
  * - Trips sorted by date in ascending order
+ * - Manual refresh button for updating data
  */
 
 import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
 import { ParticipantsModal } from '@/components/ParticipantsModal';
+import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
+import { RotateCw } from 'lucide-react';
 
 interface Participant {
   name: string;
@@ -59,9 +62,10 @@ function parseDateForSort(dateStr: string): number {
 export default function Home() {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Load trips from API
-  const { data: tripsData = [], isLoading, error } = trpc.trips.list.useQuery();
+  const { data: tripsData = [], isLoading, error, refetch } = trpc.trips.list.useQuery();
   
   // Sort trips by date in ascending order
   const trips = [...tripsData].sort((a, b) => {
@@ -76,6 +80,15 @@ export default function Home() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTrip(null);
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -98,14 +111,30 @@ export default function Home() {
       <main className="relative z-10 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           
-          {/* Header section */}
+          {/* Header section with refresh button */}
           <div className="mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
-            <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-3">
-              Дашборд выездов
-            </h1>
-            <p className="text-muted-foreground text-lg font-inter">
-              Информация о всех запланированных выездах и количестве участников. Нажмите на карточку для просмотра списка участников.
-            </p>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+              <div>
+                <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-3">
+                  Дашборд выездов
+                </h1>
+                <p className="text-muted-foreground text-lg font-inter">
+                  Информация о всех запланированных выездах и количестве участников. Нажмите на карточку для просмотра списка участников.
+                </p>
+              </div>
+              <Button
+                onClick={handleRefresh}
+                disabled={isRefreshing || isLoading}
+                variant="outline"
+                className="flex items-center gap-2 whitespace-nowrap"
+              >
+                <RotateCw 
+                  size={18} 
+                  className={isRefreshing ? 'animate-spin' : ''}
+                />
+                {isRefreshing ? 'Обновление...' : 'Обновить'}
+              </Button>
+            </div>
           </div>
 
           {/* Stats section */}
