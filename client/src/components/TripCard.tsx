@@ -32,7 +32,7 @@ interface TripCardProps {
 export function TripCard({ title, date, participants, participantsList = [], onOpenModal }: TripCardProps) {
   // Determine color based on participant count
   const getColorScheme = (count: number) => {
-    if (count > 12) {
+    if (count >= 12) {
       return {
         bg: 'bg-yellow-50',
         border: 'border-yellow-200',
