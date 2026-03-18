@@ -126,7 +126,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
                 <h1 className="font-poppins font-bold text-4xl md:text-5xl text-foreground mb-3">
-                  Дашборд выездов
+                  Дашборд выездов ParaGuru 2026
                 </h1>
                 <p className="text-muted-foreground text-lg font-inter">
                   Информация о всех запланированных выездах и количестве участников. Нажмите на карточку для просмотра списка участников.
