@@ -14,6 +14,8 @@
  *   - <5: White (low)
  */
 
+import { CheckCircle2, AlertCircle } from 'lucide-react';
+
 interface Participant {
   name: string;
   paymentStatus: string;
@@ -59,6 +61,14 @@ export function TripCard({ title, date, participants, participantsList = [], onO
 
   const colorScheme = getColorScheme(participants);
 
+  // Calculate payment stats
+  const paidCount = participantsList.filter(
+    p => p.paymentStatus === 'оплачено'
+  ).length;
+  const unpaidCount = participantsList.filter(
+    p => p.paymentStatus === 'не оплачено'
+  ).length;
+
   return (
     <div className="group relative">
       {/* Card container with color-coded styling */}
@@ -72,7 +82,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         onClick={onOpenModal}
       >
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-4">
           <h3 className="font-poppins font-semibold text-sm text-foreground line-clamp-2">
             {title}
           </h3>
@@ -82,14 +92,45 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         </div>
 
         {/* Participants count - Large display */}
-        <div>
+        <div className="mb-4 pb-4 border-b border-border/20">
           <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-2">
             Участники
           </p>
-          <p className={`font-poppins font-bold text-4xl ${colorScheme.accent}`}>
+          <p className={`font-poppins font-bold text-3xl ${colorScheme.accent}`}>
             {participants}
           </p>
         </div>
+
+        {/* Payment Stats */}
+        {participantsList.length > 0 && (
+          <div className="grid grid-cols-2 gap-2">
+            {/* Paid */}
+            <div className="bg-green-50 rounded-lg p-2.5">
+              <div className="flex items-center gap-1 mb-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                <p className="text-xs text-green-700 font-inter font-semibold">
+                  Оплачено
+                </p>
+              </div>
+              <p className="font-poppins font-bold text-base text-green-600">
+                {paidCount}
+              </p>
+            </div>
+
+            {/* Unpaid */}
+            <div className="bg-red-50 rounded-lg p-2.5">
+              <div className="flex items-center gap-1 mb-1">
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                <p className="text-xs text-red-700 font-inter font-semibold">
+                  Не оплачено
+                </p>
+              </div>
+              <p className="font-poppins font-bold text-base text-red-600">
+                {unpaidCount}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Click hint */}
         <div className="absolute inset-0 rounded-[16px] bg-black/0 group-hover:bg-black/5 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
