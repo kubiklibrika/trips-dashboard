@@ -9,6 +9,7 @@
  * - Click on trip card to view participants list
  * - Color-coded cards by participant count
  * - Data loaded from Google Drive API
+ * - Trips sorted by date in ascending order
  */
 
 import { useEffect, useState } from 'react';
@@ -29,12 +30,43 @@ interface Trip {
   participantsList: Participant[];
 }
 
+// Month mapping for date parsing
+const monthMap: { [key: string]: number } = {
+  'января': 1, 'февраля': 2, 'марта': 3, 'апреля': 4, 'мая': 5, 'июня': 6,
+  'июля': 7, 'августа': 8, 'сентября': 9, 'октября': 10, 'ноября': 11, 'декабря': 12
+};
+
+// Parse date string and return comparable number for sorting
+function parseDateForSort(dateStr: string): number {
+  if (!dateStr) return 0;
+  
+  // Try to parse dates like "20-29 марта" or "7/11 сентября"
+  const parts = dateStr.toLowerCase().split(' ');
+  if (parts.length < 2) return 0;
+  
+  const monthName = parts[parts.length - 1];
+  const month = monthMap[monthName] || 0;
+  
+  // Extract first day number from date range
+  const dayPart = parts[0];
+  const dayMatch = dayPart.match(/\d+/);
+  const day = dayMatch ? parseInt(dayMatch[0]) : 0;
+  
+  // Return comparable number: month * 100 + day
+  return month * 100 + day;
+}
+
 export default function Home() {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load trips from API
-  const { data: trips = [], isLoading, error } = trpc.trips.list.useQuery();
+  const { data: tripsData = [], isLoading, error } = trpc.trips.list.useQuery();
+  
+  // Sort trips by date in ascending order
+  const trips = [...tripsData].sort((a, b) => {
+    return parseDateForSort(a.date) - parseDateForSort(b.date);
+  });
 
   const handleOpenModal = (trip: Trip) => {
     setSelectedTrip(trip);
