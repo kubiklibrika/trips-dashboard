@@ -6,23 +6,29 @@
  * - Rounded corners: 16px
  * - Hover effect: Lift-up with increased shadow
  * - Smooth transitions: 0.2s ease-out
+ * - Click to open participants modal
  */
 
 interface TripCardProps {
   title: string;
   date: string;
   participants: number;
+  participantsList?: string[];
+  onOpenModal?: () => void;
 }
 
-export function TripCard({ title, date, participants }: TripCardProps) {
+export function TripCard({ title, date, participants, participantsList = [], onOpenModal }: TripCardProps) {
   return (
     <div className="group relative">
       {/* Card container with neomorphic styling */}
-      <div className="bg-card text-card-foreground rounded-[16px] p-6 transition-all duration-200 ease-out cursor-pointer
+      <div 
+        className="bg-card text-card-foreground rounded-[16px] p-6 transition-all duration-200 ease-out cursor-pointer
                       shadow-[0_8px_24px_rgba(0,0,0,0.08)]
                       hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]
                       hover:-translate-y-1
-                      border border-border/50">
+                      border border-border/50"
+        onClick={onOpenModal}
+      >
         
         {/* Content wrapper */}
         <div className="flex flex-col h-full justify-between">
@@ -55,9 +61,14 @@ export function TripCard({ title, date, participants }: TripCardProps) {
               </p>
             </div>
             
-            {/* Decorative element */}
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 
-                            opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+            {/* Decorative element with click hint */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 
+                              opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <p className="text-xs text-muted-foreground font-inter opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                Нажми
+              </p>
+            </div>
           </div>
         </div>
       </div>

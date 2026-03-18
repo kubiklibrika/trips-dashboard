@@ -6,21 +6,26 @@
  * - Grid layout with 3-4 columns
  * - Soft shadows and smooth interactions
  * - Professional, calm atmosphere
+ * - Click on trip card to view participants list
  */
 
 import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
+import { ParticipantsModal } from '@/components/ParticipantsModal';
 
 interface Trip {
   id: number;
   title: string;
   date: string;
   participants: number;
+  participantsList: string[];
 }
 
 export default function Home() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // Load trips data from JSON file
@@ -33,18 +38,18 @@ export default function Home() {
         console.error('Error loading trips data:', error);
         // Fallback data if file doesn't load
         setTrips([
-          { id: 1, title: "Турция - Анталья+Олю", date: "20-29 марта", participants: 22 },
-          { id: 2, title: "Турция - Анталья+Олю", date: "3-12 апреля", participants: 17 },
-          { id: 3, title: "Россия - Дагестан", date: "17-26 апреля", participants: 20 },
-          { id: 4, title: "Россия - Чегем", date: "25-29 мая", participants: 23 },
-          { id: 5, title: "Россия - Чегем", date: "15-19 июня", participants: 22 },
-          { id: 6, title: "Россия - Чегем", date: "22-26 июня", participants: 18 },
-          { id: 7, title: "Россия - Чегем", date: "13-17 июля", participants: 23 },
-          { id: 8, title: "Россия - Чегем", date: "20-24 июля", participants: 19 },
-          { id: 9, title: "Россия - Чегем", date: "17-21 августа", participants: 15 },
-          { id: 10, title: "Россия - Чегем", date: "24-28 августа", participants: 11 },
-          { id: 11, title: "Россия - Чегем", date: "7-11 сентября", participants: 23 },
-          { id: 12, title: "Турция - Олюдениз", date: "2-11 октября", participants: 13 },
+          { id: 1, title: "Турция - Анталья+Олю", date: "20-29 марта", participants: 11, participantsList: [] },
+          { id: 2, title: "Турция - Анталья+Олю", date: "3-12 апреля", participants: 6, participantsList: [] },
+          { id: 3, title: "Россия - Дагестан", date: "17-26 апреля", participants: 9, participantsList: [] },
+          { id: 4, title: "Россия - Чегем", date: "25-29 мая", participants: 12, participantsList: [] },
+          { id: 5, title: "Россия - Чегем", date: "15-19 июня", participants: 12, participantsList: [] },
+          { id: 6, title: "Россия - Чегем", date: "22-26 июня", participants: 7, participantsList: [] },
+          { id: 7, title: "Россия - Чегем", date: "13-17 июля", participants: 12, participantsList: [] },
+          { id: 8, title: "Россия - Чегем", date: "20-24 июля", participants: 8, participantsList: [] },
+          { id: 9, title: "Россия - Чегем", date: "17-21 августа", participants: 4, participantsList: [] },
+          { id: 10, title: "Россия - Чегем", date: "24-28 августа", participants: 0, participantsList: [] },
+          { id: 11, title: "Россия - Чегем", date: "7-11 сентября", participants: 12, participantsList: [] },
+          { id: 12, title: "Турция - Олюдениз", date: "2-11 октября", participants: 2, participantsList: [] },
         ]);
       } finally {
         setLoading(false);
@@ -53,6 +58,16 @@ export default function Home() {
 
     loadTrips();
   }, []);
+
+  const handleOpenModal = (trip: Trip) => {
+    setSelectedTrip(trip);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTrip(null);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +95,7 @@ export default function Home() {
               Дашборд выездов
             </h1>
             <p className="text-muted-foreground text-lg font-inter">
-              Информация о всех запланированных выездах и количестве участников
+              Информация о всех запланированных выездах и количестве участников. Нажмите на карточку для просмотра списка участников.
             </p>
           </div>
 
@@ -135,6 +150,8 @@ export default function Home() {
                     title={trip.title}
                     date={trip.date}
                     participants={trip.participants}
+                    participantsList={trip.participantsList}
+                    onOpenModal={() => handleOpenModal(trip)}
                   />
                 </div>
               ))}
@@ -148,6 +165,17 @@ export default function Home() {
           )}
         </div>
       </main>
+
+      {/* Participants Modal */}
+      {selectedTrip && (
+        <ParticipantsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          tripTitle={selectedTrip.title}
+          tripDate={selectedTrip.date}
+          participants={selectedTrip.participantsList}
+        />
+      )}
     </div>
   );
 }
