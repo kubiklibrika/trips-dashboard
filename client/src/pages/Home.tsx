@@ -141,31 +141,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Legend section */}
-          <div className="mb-8 p-4 bg-card rounded-[12px] border border-border/30">
-            <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-3">
-              Легенда цветов по количеству участников:
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-green-50 border border-green-200"></div>
-                <span className="text-xs font-inter text-foreground">10-12 (идеально)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-orange-50 border border-orange-200"></div>
-                <span className="text-xs font-inter text-foreground">&gt;12 (переполнено)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-lime-50 border border-lime-200"></div>
-                <span className="text-xs font-inter text-foreground">5-10 (приемлемо)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-card border border-border/30"></div>
-                <span className="text-xs font-inter text-foreground">&lt;5 (мало)</span>
-              </div>
-            </div>
-          </div>
-
           {/* Trips grid */}
           {!loading && trips.length > 0 ? (
             <div>
