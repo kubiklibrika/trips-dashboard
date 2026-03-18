@@ -13,12 +13,17 @@ import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
 import { ParticipantsModal } from '@/components/ParticipantsModal';
 
+interface Participant {
+  name: string;
+  paymentStatus: string;
+}
+
 interface Trip {
   id: number;
   title: string;
   date: string;
   participants: number;
-  participantsList: string[];
+  participantsList: Participant[];
 }
 
 export default function Home() {
@@ -38,18 +43,18 @@ export default function Home() {
         console.error('Error loading trips data:', error);
         // Fallback data if file doesn't load
         setTrips([
-          { id: 1, title: "Турция - Анталья+Олю", date: "20-29 марта", participants: 11, participantsList: [] },
-          { id: 2, title: "Турция - Анталья+Олю", date: "3-12 апреля", participants: 6, participantsList: [] },
-          { id: 3, title: "Россия - Дагестан", date: "17-26 апреля", participants: 9, participantsList: [] },
-          { id: 4, title: "Россия - Чегем", date: "25-29 мая", participants: 12, participantsList: [] },
-          { id: 5, title: "Россия - Чегем", date: "15-19 июня", participants: 12, participantsList: [] },
-          { id: 6, title: "Россия - Чегем", date: "22-26 июня", participants: 7, participantsList: [] },
-          { id: 7, title: "Россия - Чегем", date: "13-17 июля", participants: 12, participantsList: [] },
-          { id: 8, title: "Россия - Чегем", date: "20-24 июля", participants: 8, participantsList: [] },
-          { id: 9, title: "Россия - Чегем", date: "17-21 августа", participants: 4, participantsList: [] },
-          { id: 10, title: "Россия - Чегем", date: "24-28 августа", participants: 0, participantsList: [] },
-          { id: 11, title: "Россия - Чегем", date: "7-11 сентября", participants: 12, participantsList: [] },
-          { id: 12, title: "Турция - Олюдениз", date: "2-11 октября", participants: 2, participantsList: [] },
+          { id: 1, title: "Турция - Анталья+Олю", date: "20-29 марта", participants: 11, participantsList: [] as Participant[] },
+          { id: 2, title: "Турция - Анталья+Олю", date: "3-12 апреля", participants: 6, participantsList: [] as Participant[] },
+          { id: 3, title: "Россия - Дагестан", date: "17-26 апреля", participants: 9, participantsList: [] as Participant[] },
+          { id: 4, title: "Россия - Чегем", date: "25-29 мая", participants: 12, participantsList: [] as Participant[] },
+          { id: 5, title: "Россия - Чегем", date: "15-19 июня", participants: 12, participantsList: [] as Participant[] },
+          { id: 6, title: "Россия - Чегем", date: "22-26 июня", participants: 7, participantsList: [] as Participant[] },
+          { id: 7, title: "Россия - Чегем", date: "13-17 июля", participants: 12, participantsList: [] as Participant[] },
+          { id: 8, title: "Россия - Чегем", date: "20-24 июля", participants: 8, participantsList: [] as Participant[] },
+          { id: 9, title: "Россия - Чегем", date: "17-21 августа", participants: 4, participantsList: [] as Participant[] },
+          { id: 10, title: "Россия - Чегем", date: "24-28 августа", participants: 0, participantsList: [] as Participant[] },
+          { id: 11, title: "Россия - Чегем", date: "7-11 сентября", participants: 12, participantsList: [] as Participant[] },
+          { id: 12, title: "Турция - Олюдениз", date: "2-11 октября", participants: 2, participantsList: [] as Participant[] },
         ]);
       } finally {
         setLoading(false);

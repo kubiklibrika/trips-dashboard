@@ -2,22 +2,30 @@
  * ParticipantsModal Component
  * 
  * Design Philosophy: Neomorphic modal with smooth animations
- * - Displays list of participants for a trip
+ * - Displays list of participants for a trip with payment status
  * - Search field to filter participants by name
+ * - Filter buttons for payment status
  * - Smooth entrance/exit animations
  * - Clean, readable list format
  */
 
 import { useState, useMemo } from 'react';
-import { X, Users, Search } from 'lucide-react';
+import { X, Users, Search, CheckCircle2, AlertCircle } from 'lucide-react';
+
+interface Participant {
+  name: string;
+  paymentStatus: string;
+}
 
 interface ParticipantsModalProps {
   isOpen: boolean;
   onClose: () => void;
   tripTitle: string;
   tripDate: string;
-  participants: string[];
+  participants: Participant[];
 }
+
+type PaymentFilter = 'all' | 'paid' | 'unpaid';
 
 export function ParticipantsModal({
   isOpen,
@@ -27,20 +35,57 @@ export function ParticipantsModal({
   participants,
 }: ParticipantsModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>('all');
 
-  // Filter participants based on search query
+  // Filter participants based on search query and payment status
   const filteredParticipants = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return participants;
+    let filtered = participants;
+
+    // Apply payment filter
+    if (paymentFilter === 'paid') {
+      filtered = filtered.filter(p => p.paymentStatus === 'оплачено');
+    } else if (paymentFilter === 'unpaid') {
+      filtered = filtered.filter(p => p.paymentStatus === 'не оплачено');
     }
-    
-    const query = searchQuery.toLowerCase();
-    return participants.filter(participant =>
-      participant.toLowerCase().includes(query)
-    );
-  }, [participants, searchQuery]);
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(participant =>
+        participant.name.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [participants, searchQuery, paymentFilter]);
+
+  // Calculate payment statistics
+  const stats = useMemo(() => {
+    const paid = participants.filter(p => p.paymentStatus === 'оплачено').length;
+    const unpaid = participants.filter(p => p.paymentStatus === 'не оплачено').length;
+    return { paid, unpaid, total: participants.length };
+  }, [participants]);
 
   if (!isOpen) return null;
+
+  const getPaymentBadge = (status: string) => {
+    if (status === 'оплачено') {
+      return (
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-50 rounded-full">
+          <CheckCircle2 className="w-4 h-4 text-green-600" />
+          <span className="text-xs font-medium text-green-700">Оплачено</span>
+        </div>
+      );
+    } else if (status === 'не оплачено') {
+      return (
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-50 rounded-full">
+          <AlertCircle className="w-4 h-4 text-red-600" />
+          <span className="text-xs font-medium text-red-700">Не оплачено</span>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <>
@@ -54,7 +99,7 @@ export function ParticipantsModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div
           className="bg-card text-card-foreground rounded-[16px] shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                     max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col
+                     max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col
                      border border-border/50"
           onClick={(e) => e.stopPropagation()}
         >
@@ -81,8 +126,39 @@ export function ParticipantsModal({
             </button>
           </div>
 
-          {/* Search field */}
-          <div className="px-6 pt-6 pb-4 border-b border-border/30">
+          {/* Stats section */}
+          <div className="px-6 pt-4 pb-2 border-b border-border/30">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 bg-secondary/30 rounded-lg">
+                <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-1">
+                  Всего
+                </p>
+                <p className="font-poppins font-semibold text-lg text-foreground">
+                  {stats.total}
+                </p>
+              </div>
+              <div className="p-3 bg-green-50 rounded-lg">
+                <p className="text-xs text-green-700 font-inter uppercase tracking-wider mb-1">
+                  Оплачено
+                </p>
+                <p className="font-poppins font-semibold text-lg text-green-600">
+                  {stats.paid}
+                </p>
+              </div>
+              <div className="p-3 bg-red-50 rounded-lg">
+                <p className="text-xs text-red-700 font-inter uppercase tracking-wider mb-1">
+                  Не оплачено
+                </p>
+                <p className="font-poppins font-semibold text-lg text-red-600">
+                  {stats.unpaid}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and filter section */}
+          <div className="px-6 pt-4 pb-4 border-b border-border/30 space-y-3">
+            {/* Search field */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -95,6 +171,42 @@ export function ParticipantsModal({
                            font-inter transition-all duration-200"
               />
             </div>
+
+            {/* Filter buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPaymentFilter('all')}
+                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 ${
+                  paymentFilter === 'all'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary/50 text-foreground hover:bg-secondary'
+                }`}
+              >
+                Все
+              </button>
+              <button
+                onClick={() => setPaymentFilter('paid')}
+                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                  paymentFilter === 'paid'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-green-50 text-green-700 hover:bg-green-100'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Оплачено
+              </button>
+              <button
+                onClick={() => setPaymentFilter('unpaid')}
+                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                  paymentFilter === 'unpaid'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-red-50 text-red-700 hover:bg-red-100'
+                }`}
+              >
+                <AlertCircle className="w-4 h-4" />
+                Не оплачено
+              </button>
+            </div>
           </div>
 
           {/* Content */}
@@ -103,7 +215,7 @@ export function ParticipantsModal({
               <div>
                 <p className="text-sm text-muted-foreground font-inter uppercase tracking-wider mb-4">
                   Найдено участников: <span className="font-poppins font-semibold text-primary">{filteredParticipants.length}</span>
-                  {searchQuery && <span className="text-xs ml-2">из {participants.length}</span>}
+                  {(searchQuery || paymentFilter !== 'all') && <span className="text-xs ml-2">из {participants.length}</span>}
                 </p>
                 <ul className="space-y-2">
                   {filteredParticipants.map((participant, index) => {
@@ -112,16 +224,21 @@ export function ParticipantsModal({
                     return (
                       <li
                         key={index}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors duration-150"
+                        className="flex items-center justify-between gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors duration-150"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                          <span className="text-xs font-poppins font-semibold text-primary">
-                            {originalIndex + 1}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                            <span className="text-xs font-poppins font-semibold text-primary">
+                              {originalIndex + 1}
+                            </span>
+                          </div>
+                          <span className="font-inter text-foreground truncate">
+                            {participant.name}
                           </span>
                         </div>
-                        <span className="font-inter text-foreground">
-                          {participant}
-                        </span>
+                        <div className="flex-shrink-0">
+                          {getPaymentBadge(participant.paymentStatus)}
+                        </div>
                       </li>
                     );
                   })}
@@ -131,7 +248,7 @@ export function ParticipantsModal({
               <div className="flex flex-col items-center justify-center py-12">
                 <Search className="w-12 h-12 text-muted-foreground/30 mb-3" />
                 <p className="text-muted-foreground font-inter">
-                  {searchQuery ? 'Участники не найдены' : 'Нет данных об участниках'}
+                  {searchQuery || paymentFilter !== 'all' ? 'Участники не найдены' : 'Нет данных об участниках'}
                 </p>
               </div>
             )}

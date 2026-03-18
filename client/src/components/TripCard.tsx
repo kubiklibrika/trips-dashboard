@@ -9,11 +9,16 @@
  * - Click to open participants modal
  */
 
+interface Participant {
+  name: string;
+  paymentStatus: string;
+}
+
 interface TripCardProps {
   title: string;
   date: string;
   participants: number;
-  participantsList?: string[];
+  participantsList?: Participant[];
   onOpenModal?: () => void;
 }
 
