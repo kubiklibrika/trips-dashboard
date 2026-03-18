@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
 import { ParticipantsModal } from '@/components/ParticipantsModal';
+import { PaymentStatsCard } from '@/components/PaymentStatsCard';
 
 interface Participant {
   name: string;
@@ -140,26 +141,68 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Payment Stats Section */}
+          {!loading && trips.length > 0 ? (
+            <div className="mb-12">
+              <h2 className="font-poppins font-semibold text-2xl text-foreground mb-6">
+                Статистика оплат по выездам
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {trips.map((trip, index) => {
+                  const paidCount = trip.participantsList.filter(
+                    p => p.paymentStatus === 'оплачено'
+                  ).length;
+                  const unpaidCount = trip.participantsList.filter(
+                    p => p.paymentStatus === 'не оплачено'
+                  ).length;
+
+                  return (
+                    <div
+                      key={`stats-${trip.id}`}
+                      className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                      style={{
+                        animationDelay: `${100 + index * 50}ms`,
+                      }}
+                    >
+                      <PaymentStatsCard
+                        tripTitle={trip.title}
+                        tripDate={trip.date}
+                        totalParticipants={trip.participants}
+                        paidCount={paidCount}
+                        unpaidCount={unpaidCount}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
           {/* Trips grid */}
           {!loading && trips.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {trips.map((trip, index) => (
-                <div
-                  key={trip.id}
-                  className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-                  style={{
-                    animationDelay: `${100 + index * 50}ms`,
-                  }}
-                >
-                  <TripCard
-                    title={trip.title}
-                    date={trip.date}
-                    participants={trip.participants}
-                    participantsList={trip.participantsList}
-                    onOpenModal={() => handleOpenModal(trip)}
-                  />
-                </div>
-              ))}
+            <div>
+              <h2 className="font-poppins font-semibold text-2xl text-foreground mb-6">
+                Список выездов
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {trips.map((trip, index) => (
+                  <div
+                    key={trip.id}
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                    style={{
+                      animationDelay: `${100 + index * 50}ms`,
+                    }}
+                  >
+                    <TripCard
+                      title={trip.title}
+                      date={trip.date}
+                      participants={trip.participants}
+                      participantsList={trip.participantsList}
+                      onOpenModal={() => handleOpenModal(trip)}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="text-center py-12">
