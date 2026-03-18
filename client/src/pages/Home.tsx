@@ -19,6 +19,7 @@ import { ParticipantsModal } from '@/components/ParticipantsModal';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
 import { RotateCw } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Participant {
   name: string;
@@ -86,6 +87,15 @@ export default function Home() {
     setIsRefreshing(true);
     try {
       await refetch();
+      toast.success('Данные обновлены', {
+        description: 'Информация о выездах успешно загружена из Google Drive',
+        duration: 3000,
+      });
+    } catch (error) {
+      toast.error('Ошибка обновления', {
+        description: 'Не удалось загрузить данные. Попробуйте позже.',
+        duration: 3000,
+      });
     } finally {
       setIsRefreshing(false);
     }
