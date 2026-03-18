@@ -107,16 +107,20 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
   const rows = XLSX.utils.sheet_to_json<any>(sheet);
   const participants: Participant[] = [];
 
+  console.log(`[parseExcelFile] Total rows: ${rows.length}`);
+  if (rows.length > 0) {
+    console.log(`[parseExcelFile] First row keys:`, Object.keys(rows[0]));
+    console.log(`[parseExcelFile] First row values:`, Object.values(rows[0]));
+  }
+
   for (const row of rows) {
     // Skip header rows and empty rows
     if (!row || typeof row !== "object") continue;
 
-    // Get the first column value (name)
-    const firstCol = Object.values(row)[0];
+    // Get name from ФИО column (not from first column)
+    const name = (row["ФИО"] || "").toString().trim();
     
-    if (!firstCol || typeof firstCol !== "string") continue;
-    
-    const name = firstCol.trim();
+    if (!name) continue;
     
     // Skip service rows
     if (
@@ -126,20 +130,28 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       name.toLowerCase().includes("зарплат") ||
       name.toLowerCase().includes("проживан") ||
       name.toLowerCase().includes("итого") ||
-      name === ""
+      name.toLowerCase().includes("билет") ||
+      name.toLowerCase().includes("жилья") ||
+      name.toLowerCase().includes("доход") ||
+      name.toLowerCase().includes("чистыми") ||
+      name === "" ||
+      name === "ЗП"
     ) {
+      console.log(`[DEBUG] SKIP: "${name}"`);
       continue;
     }
 
-    // Look for payment status in other columns
+    // Get payment status from "Факт оплаты" column
     let paymentStatus = "unknown";
-    const rowValues = Object.values(row).join(" ").toLowerCase();
+    const paymentValue = (row["Факт оплаты"] || "").toString().toLowerCase().trim();
     
-    if (rowValues.includes("оплачено") || rowValues.includes("да")) {
+    if (paymentValue === "да") {
       paymentStatus = "paid";
-    } else if (rowValues.includes("не оплачено") || rowValues.includes("нет")) {
+    } else if (paymentValue === "нет") {
       paymentStatus = "unpaid";
     }
+
+    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus}`);
 
     participants.push({
       name,
@@ -147,6 +159,7 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
     });
   }
 
+  console.log(`[parseExcelFile] Total participants parsed: ${participants.length}`);
   return participants;
 }
 

@@ -43,9 +43,9 @@ export function ParticipantsModal({
 
     // Apply payment filter
     if (paymentFilter === 'paid') {
-      filtered = filtered.filter(p => p.paymentStatus === 'оплачено');
+      filtered = filtered.filter(p => p.paymentStatus === 'paid');
     } else if (paymentFilter === 'unpaid') {
-      filtered = filtered.filter(p => p.paymentStatus === 'не оплачено');
+      filtered = filtered.filter(p => p.paymentStatus === 'unpaid');
     }
 
     // Apply search filter
@@ -61,22 +61,22 @@ export function ParticipantsModal({
 
   // Calculate payment statistics
   const stats = useMemo(() => {
-    const paid = participants.filter(p => p.paymentStatus === 'оплачено').length;
-    const unpaid = participants.filter(p => p.paymentStatus === 'не оплачено').length;
+    const paid = participants.filter(p => p.paymentStatus === 'paid').length;
+    const unpaid = participants.filter(p => p.paymentStatus === 'unpaid').length;
     return { paid, unpaid, total: participants.length };
   }, [participants]);
 
   if (!isOpen) return null;
 
   const getPaymentBadge = (status: string) => {
-    if (status === 'оплачено') {
+    if (status === 'paid') {
       return (
         <div className="flex items-center gap-1 px-2.5 py-1 bg-green-50 rounded-full">
           <CheckCircle2 className="w-4 h-4 text-green-600" />
           <span className="text-xs font-medium text-green-700">Оплачено</span>
         </div>
       );
-    } else if (status === 'не оплачено') {
+    } else if (status === 'unpaid') {
       return (
         <div className="flex items-center gap-1 px-2.5 py-1 bg-red-50 rounded-full">
           <AlertCircle className="w-4 h-4 text-red-600" />

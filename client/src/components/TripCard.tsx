@@ -51,10 +51,10 @@ export function TripCard({ title, date, participants, participantsList = [], onO
 
   // Calculate payment stats
   const paidCount = participantsList.filter(
-    p => p.paymentStatus === 'оплачено'
+    p => p.paymentStatus === 'paid'
   ).length;
   const unpaidCount = participantsList.filter(
-    p => p.paymentStatus === 'не оплачено'
+    p => p.paymentStatus === 'unpaid'
   ).length;
 
   return (
