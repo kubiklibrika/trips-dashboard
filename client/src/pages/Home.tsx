@@ -8,11 +8,13 @@
  * - Professional, calm atmosphere
  * - Click on trip card to view participants list
  * - Color-coded cards by participant count
+ * - Data loaded from Google Drive API
  */
 
 import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
 import { ParticipantsModal } from '@/components/ParticipantsModal';
+import { trpc } from '@/lib/trpc';
 
 interface Participant {
   name: string;
@@ -28,42 +30,11 @@ interface Trip {
 }
 
 export default function Home() {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    // Load trips data from JSON file
-    const loadTrips = async () => {
-      try {
-        const response = await fetch('/trips-data.json');
-        const data = await response.json();
-        setTrips(data);
-      } catch (error) {
-        console.error('Error loading trips data:', error);
-        // Fallback data if file doesn't load
-        setTrips([
-          { id: 1, title: "Турция - Анталья+Олю", date: "20-29 марта", participants: 11, participantsList: [] as Participant[] },
-          { id: 2, title: "Турция - Анталья+Олю", date: "3-12 апреля", participants: 6, participantsList: [] as Participant[] },
-          { id: 3, title: "Россия - Дагестан", date: "17-26 апреля", participants: 9, participantsList: [] as Participant[] },
-          { id: 4, title: "Россия - Чегем", date: "25-29 мая", participants: 12, participantsList: [] as Participant[] },
-          { id: 5, title: "Россия - Чегем", date: "15-19 июня", participants: 12, participantsList: [] as Participant[] },
-          { id: 6, title: "Россия - Чегем", date: "22-26 июня", participants: 7, participantsList: [] as Participant[] },
-          { id: 7, title: "Россия - Чегем", date: "13-17 июля", participants: 12, participantsList: [] as Participant[] },
-          { id: 8, title: "Россия - Чегем", date: "20-24 июля", participants: 8, participantsList: [] as Participant[] },
-          { id: 9, title: "Россия - Чегем", date: "17-21 августа", participants: 4, participantsList: [] as Participant[] },
-          { id: 10, title: "Россия - Чегем", date: "24-28 августа", participants: 0, participantsList: [] as Participant[] },
-          { id: 11, title: "Россия - Чегем", date: "7-11 сентября", participants: 12, participantsList: [] as Participant[] },
-          { id: 12, title: "Турция - Олюдениз", date: "2-11 октября", participants: 2, participantsList: [] as Participant[] },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadTrips();
-  }, []);
+  // Load trips from API
+  const { data: trips = [], isLoading, error } = trpc.trips.list.useQuery();
 
   const handleOpenModal = (trip: Trip) => {
     setSelectedTrip(trip);
@@ -109,6 +80,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {/* Total trips card */}
             <div className="bg-card rounded-[16px] p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-border/50
+
                             animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
               <p className="text-sm text-muted-foreground font-inter uppercase tracking-wider mb-2">
                 Всего выездов
@@ -120,6 +92,7 @@ export default function Home() {
 
             {/* Total participants card */}
             <div className="bg-card rounded-[16px] p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-border/50
+
                             animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
               <p className="text-sm text-muted-foreground font-inter uppercase tracking-wider mb-2">
                 Всего участников
@@ -131,6 +104,7 @@ export default function Home() {
 
             {/* Average participants card */}
             <div className="bg-card rounded-[16px] p-6 shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-border/50
+
                             animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
               <p className="text-sm text-muted-foreground font-inter uppercase tracking-wider mb-2">
                 Среднее на выезд
@@ -142,7 +116,7 @@ export default function Home() {
           </div>
 
           {/* Trips grid */}
-          {!loading && trips.length > 0 ? (
+          {!isLoading && trips.length > 0 ? (
             <div>
               <h2 className="font-poppins font-semibold text-2xl text-foreground mb-6">
                 Выезды
@@ -170,7 +144,7 @@ export default function Home() {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground font-inter text-lg">
-                {loading ? 'Загрузка данных...' : 'Нет данных о выездах'}
+                {isLoading ? 'Загрузка данных из Google Drive...' : error ? 'Ошибка при загрузке данных' : 'Нет данных о выездах'}
               </p>
             </div>
           )}
