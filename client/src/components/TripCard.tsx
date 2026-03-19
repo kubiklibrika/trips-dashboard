@@ -1,17 +1,18 @@
 /**
  * TripCard Component
  * 
- * Design Philosophy: Neomorphic style with soft shadows and muted colors
- * - Soft shadow: 0 8px 24px rgba(0,0,0,0.08)
+ * Design Philosophy: Liquid Glass style with frosted glass effect
+ * - Backdrop blur for glass effect
+ * - Semi-transparent background with RGBA
+ * - Soft shadow for depth
  * - Rounded corners: 16px
- * - Hover effect: Lift-up with increased shadow
+ * - Hover effect: Enhanced glass effect with more blur
  * - Smooth transitions: 0.2s ease-out
  * - Click to open participants modal
  * - Color coding by participant count:
- *   - 10-12: Green (ideal)
- *   - >12: Orange (over capacity)
- *   - 5-10: Light green (acceptable)
- *   - <5: White (low)
+ *   - 10-12: Soft yellow background
+ *   - >12: Soft yellow background
+ *   - <12: Frosted glass effect
  */
 
 import { CheckCircle2, AlertCircle } from 'lucide-react';
@@ -59,14 +60,19 @@ export function TripCard({ title, date, participants, participantsList = [], onO
 
   return (
     <div className="group relative">
-      {/* Card container with color-coded styling */}
+      {/* Card container with Liquid Glass styling */}
       <div
-        className={`relative ${colorScheme.bg} text-card-foreground rounded-[16px] p-5
-                   shadow-[0_8px_24px_rgba(0,0,0,0.08)]
-                   border ${colorScheme.border}
-                   hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]
+        className={`relative rounded-[16px] p-5
+                   shadow-[0_8px_32px_rgba(0,0,0,0.1)]
+                   border border-white/20
+                   hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
                    transition-all duration-200 ease-out
-                   cursor-pointer h-full`}
+                   cursor-pointer h-full
+                   backdrop-blur-md
+                   ${colorScheme.bg === 'bg-yellow-50' 
+                     ? 'bg-yellow-50/80 border-yellow-200/30' 
+                     : 'bg-white/10 border-white/20'}
+                   hover:backdrop-blur-lg`}
         onClick={onOpenModal}
       >
         {/* Header */}
@@ -84,7 +90,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
           <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-2">
             Участники
           </p>
-          <p className={`font-poppins font-bold text-3xl ${colorScheme.accent}`}>
+          <p className="font-poppins font-bold text-3xl text-primary">
             {participants}
           </p>
         </div>
