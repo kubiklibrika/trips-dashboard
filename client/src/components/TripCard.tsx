@@ -1,18 +1,19 @@
 /**
  * TripCard Component
  * 
- * Design Philosophy: Liquid Glass style with frosted glass effect
+ * Design Philosophy: Liquid Glass style with frosted glass effect and location-based backgrounds
  * - Backdrop blur for glass effect
- * - Semi-transparent background with RGBA
+ * - Semi-transparent background with gradient based on location
  * - Soft shadow for depth
  * - Rounded corners: 16px
  * - Hover effect: Enhanced glass effect with more blur
  * - Smooth transitions: 0.2s ease-out
  * - Click to open participants modal
- * - Color coding by participant count:
- *   - 10-12: Soft yellow background
- *   - >12: Soft yellow background
- *   - <12: Frosted glass effect
+ * - Location-based colors:
+ *   - Turkey: Cyan/Blue gradient
+ *   - Dagestan: Amber/Orange gradient
+ *   - Chegem: Slate/Blue gradient
+ *   - Default: Slate gradient
  */
 
 import { CheckCircle2, AlertCircle } from 'lucide-react';
@@ -31,24 +32,22 @@ interface TripCardProps {
 }
 
 export function TripCard({ title, date, participants, participantsList = [], onOpenModal }: TripCardProps) {
-  // Determine color based on participant count
-  const getColorScheme = (count: number) => {
-    if (count >= 12) {
-      return {
-        bg: 'bg-yellow-50',
-        border: 'border-yellow-200',
-        accent: 'text-yellow-700',
-      };
-    } else {
-      return {
-        bg: 'bg-card',
-        border: 'border-border/30',
-        accent: 'text-foreground',
-      };
+  // Determine background based on location
+  const getBackgroundStyle = (title: string) => {
+    const lowerTitle = title.toLowerCase();
+    
+    if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
+      return 'from-cyan-300/25 via-blue-300/20 to-sky-300/15';
+    } else if (lowerTitle.includes('дагестан')) {
+      return 'from-amber-300/25 via-orange-300/20 to-yellow-300/15';
+    } else if (lowerTitle.includes('чегем')) {
+      return 'from-slate-400/20 via-blue-400/15 to-slate-500/10';
     }
+    
+    return 'from-slate-300/15 via-slate-300/10 to-slate-400/5';
   };
 
-  const colorScheme = getColorScheme(participants);
+  const backgroundGradient = getBackgroundStyle(title);
 
   // Calculate payment stats
   const paidCount = participantsList.filter(
@@ -60,18 +59,16 @@ export function TripCard({ title, date, participants, participantsList = [], onO
 
   return (
     <div className="group relative">
-      {/* Card container with Liquid Glass styling */}
+      {/* Card container with Liquid Glass styling and location-based background */}
       <div
         className={`relative rounded-[16px] p-5
                    shadow-[0_8px_32px_rgba(0,0,0,0.1)]
-                   border border-white/20
+                   border border-white/30
                    hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
                    transition-all duration-200 ease-out
                    cursor-pointer h-full
                    backdrop-blur-md
-                   ${colorScheme.bg === 'bg-yellow-50' 
-                     ? 'bg-yellow-50/80 border-yellow-200/30' 
-                     : 'bg-white/10 border-white/20'}
+                   bg-gradient-to-br ${backgroundGradient}
                    hover:backdrop-blur-lg`}
         onClick={onOpenModal}
       >
@@ -99,7 +96,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         {participantsList.length > 0 && (
           <div className="grid grid-cols-2 gap-2">
             {/* Paid */}
-            <div className="bg-green-50 rounded-lg p-2.5">
+            <div className="bg-green-50/80 backdrop-blur-sm rounded-lg p-2.5">
               <div className="flex items-center gap-1 mb-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
                 <p className="text-xs text-green-700 font-inter font-semibold">
@@ -112,7 +109,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
             </div>
 
             {/* Unpaid */}
-            <div className="bg-red-50 rounded-lg p-2.5">
+            <div className="bg-red-50/80 backdrop-blur-sm rounded-lg p-2.5">
               <div className="flex items-center gap-1 mb-1">
                 <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                 <p className="text-xs text-red-700 font-inter font-semibold">
