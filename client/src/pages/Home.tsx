@@ -16,6 +16,7 @@
 import { useEffect, useState } from 'react';
 import { TripCard } from '@/components/TripCard';
 import { ParticipantsModal } from '@/components/ParticipantsModal';
+import { TripCalendar } from '@/components/TripCalendar';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
 import { RotateCw } from 'lucide-react';
@@ -211,6 +212,9 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+
+              {/* Trip Calendar */}
+              <TripCalendar trips={trips} />
             </div>
           ) : (
             <div className="text-center py-12">
