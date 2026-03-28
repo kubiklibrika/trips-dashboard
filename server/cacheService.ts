@@ -11,7 +11,7 @@ let cache: CacheData = {
   lastUpdated: 0,
 };
 
-const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 /**
  * Get cached trips data

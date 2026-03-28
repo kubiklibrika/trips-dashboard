@@ -2,7 +2,8 @@ import axios from "axios";
 
 function getDashboardUrl(): string {
   // Get the app URL from environment or use default
-  const appUrl = process.env.APP_URL || process.env.VITE_FRONTEND_FORGE_API_URL?.replace('/api', '') || 'https://tripsdash-y478acgk.manus.space';
+  // Return just the base URL without any path
+  const appUrl = process.env.APP_URL || 'https://tripsdash-y478acgk.manus.space';
   return appUrl;
 }
 
