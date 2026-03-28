@@ -15,7 +15,7 @@ function getTelegramApiUrl() {
 interface TelegramMessage {
   title: string;
   content: string;
-  type: "new_trip" | "new_participant" | "general";
+  type: "new_trip" | "new_participant" | "added_participant" | "removed_participant" | "payment_status_changed" | "general";
 }
 
 /**
@@ -63,6 +63,18 @@ function formatMessage(message: TelegramMessage): string {
     text = `<b>👤 Новый участник!</b>\n\n`;
     text += `<b>${message.title}</b>\n`;
     text += `${message.content}`;
+  } else if (message.type === "added_participant") {
+    text = `<b>➕ Добавлен участник</b>\n\n`;
+    text += `<b>${message.title}</b>\n`;
+    text += `${message.content}`;
+  } else if (message.type === "removed_participant") {
+    text = `<b>➖ Удален участник</b>\n\n`;
+    text += `<b>${message.title}</b>\n`;
+    text += `${message.content}`;
+  } else if (message.type === "payment_status_changed") {
+    text = `<b>💳 Изменен статус оплаты</b>\n\n`;
+    text += `<b>${message.title}</b>\n`;
+    text += `${message.content}`;
   } else {
     text = `<b>${message.title}</b>\n\n${message.content}`;
   }
@@ -100,6 +112,60 @@ export async function notifyNewParticipants(
     title: `${newParticipants.length} новых участников`,
     content: content,
     type: "new_participant",
+  });
+}
+
+/**
+ * Send notification about added participant
+ */
+export async function notifyAddedParticipant(
+  tripTitle: string,
+  participantName: string,
+  paymentStatus: string
+): Promise<boolean> {
+  const statusText = paymentStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const content = `${participantName}\nСтатус: ${statusText}`;
+  
+  return sendTelegramMessage({
+    title: tripTitle,
+    content: content,
+    type: "added_participant",
+  });
+}
+
+/**
+ * Send notification about removed participant
+ */
+export async function notifyRemovedParticipant(
+  tripTitle: string,
+  participantName: string
+): Promise<boolean> {
+  const content = `${participantName}`;
+  
+  return sendTelegramMessage({
+    title: tripTitle,
+    content: content,
+    type: "removed_participant",
+  });
+}
+
+/**
+ * Send notification about payment status change
+ */
+export async function notifyPaymentStatusChange(
+  tripTitle: string,
+  participantName: string,
+  oldStatus: string,
+  newStatus: string
+): Promise<boolean> {
+  const oldStatusText = oldStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const newStatusText = newStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const content = `${participantName}\n${oldStatusText} → ${newStatusText}`;
+  
+  return sendTelegramMessage({
+    title: tripTitle,
+    content: content,
+    type: "payment_status_changed",
   });
 }
 

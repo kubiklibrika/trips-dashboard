@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import axios from "axios";
-import { testTelegramConnection, notifyNewTrip, notifyNewParticipants } from "./telegramService";
+import { testTelegramConnection, notifyNewTrip, notifyNewParticipants, notifyAddedParticipant, notifyRemovedParticipant, notifyPaymentStatusChange } from "./telegramService";
 
 // Mock axios
 vi.mock("axios");
@@ -53,6 +53,36 @@ describe("Telegram Service", () => {
     
     const result = await testTelegramConnection();
     expect(result).toBe(false);
+  });
+
+  it("should send notification about added participant", async () => {
+    const result = await notifyAddedParticipant(
+      "Турция - Анталья",
+      "Иван Петров",
+      "paid"
+    );
+    expect(result).toBe(true);
+    expect(mockedAxios.post).toHaveBeenCalled();
+  });
+
+  it("should send notification about removed participant", async () => {
+    const result = await notifyRemovedParticipant(
+      "Турция - Анталья",
+      "Иван Петров"
+    );
+    expect(result).toBe(true);
+    expect(mockedAxios.post).toHaveBeenCalled();
+  });
+
+  it("should send notification about payment status change", async () => {
+    const result = await notifyPaymentStatusChange(
+      "Турция - Анталья",
+      "Иван Петров",
+      "unpaid",
+      "paid"
+    );
+    expect(result).toBe(true);
+    expect(mockedAxios.post).toHaveBeenCalled();
   });
 });
 
