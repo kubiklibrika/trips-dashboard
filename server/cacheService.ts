@@ -1,4 +1,5 @@
 import { loadTripsFromGoogleDrive } from "./googleDriveService";
+import { trackAndNotifyChanges } from "./changeTracker";
 
 interface CacheData {
   trips: any[];
@@ -42,6 +43,10 @@ export async function refreshCache() {
       lastUpdated: Date.now(),
     };
     console.log(`[Cache] Cache updated at ${new Date(cache.lastUpdated).toISOString()}`);
+    
+    // Track changes and send notifications
+    await trackAndNotifyChanges(trips);
+    
     return trips;
   } catch (error) {
     console.error("[Cache] Error refreshing cache:", error);
