@@ -1,48 +1,62 @@
 import { loadTripsFromGoogleDrive } from "./googleDriveService";
 import { trackAndNotifyChanges } from "./changeTracker";
+import { getAllTrips, clearAllTripsAndParticipants, upsertTrip, upsertParticipant } from "./db";
 
-interface CacheData {
-  trips: any[];
-  lastUpdated: number;
-}
-
-let cache: CacheData = {
-  trips: [],
-  lastUpdated: 0,
-};
-
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
+const SYNC_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+let lastSyncTime = 0;
 
 /**
- * Get cached trips data
- * Returns cached data if available, otherwise loads from Google Drive
+ * Get trips from database
  */
 export async function getCachedTrips() {
-  const now = Date.now();
-  
-  // If cache is fresh, return it
-  if (cache.trips.length > 0 && now - cache.lastUpdated < CACHE_DURATION) {
-    console.log("[Cache] Returning cached trips data");
-    return cache.trips;
+  try {
+    return await getAllTrips();
+  } catch (error) {
+    console.error("[Cache] Error getting trips from database:", error);
+    throw error;
   }
-  
-  // Otherwise, load from Google Drive and update cache
-  console.log("[Cache] Cache expired or empty, loading from Google Drive");
-  return await refreshCache();
 }
 
 /**
- * Manually refresh the cache
+ * Manually refresh the cache - sync with Google Drive and save to database
  */
 export async function refreshCache() {
   try {
     console.log("[Cache] Refreshing cache from Google Drive");
     const trips = await loadTripsFromGoogleDrive();
-    cache = {
-      trips,
-      lastUpdated: Date.now(),
-    };
-    console.log(`[Cache] Cache updated at ${new Date(cache.lastUpdated).toISOString()}`);
+    
+    // Clear old data and save new data to database
+    await clearAllTripsAndParticipants();
+    
+    for (const trip of trips) {
+      // Save trip to database
+      await upsertTrip({
+        title: trip.title,
+        date: trip.date,
+        participantCount: trip.participants,
+        lastSyncedAt: new Date(),
+      });
+      
+      // Save participants to database
+      if (trip.participantsList && trip.participantsList.length > 0) {
+        // Get the trip ID from database (assuming it was just inserted)
+        const allTrips = await getAllTrips();
+        const savedTrip = allTrips.find(t => t.title === trip.title && t.date === trip.date);
+        
+        if (savedTrip) {
+          for (const participant of trip.participantsList) {
+            await upsertParticipant({
+              tripId: savedTrip.id,
+              name: participant.name,
+              paymentStatus: participant.paymentStatus,
+            });
+          }
+        }
+      }
+    }
+    
+    lastSyncTime = Date.now();
+    console.log(`[Cache] Cache updated at ${new Date(lastSyncTime).toISOString()}`);
     
     // Track changes and send notifications
     await trackAndNotifyChanges(trips);
@@ -50,69 +64,47 @@ export async function refreshCache() {
     return trips;
   } catch (error) {
     console.error("[Cache] Error refreshing cache:", error);
-    // Return stale cache if available
-    if (cache.trips.length > 0) {
-      console.log("[Cache] Returning stale cache due to error");
-      return cache.trips;
-    }
     throw error;
   }
 }
 
 /**
- * Initialize scheduled sync at specific times: 8:00, 12:00, 16:00, 20:00 UTC
+ * Initialize scheduled sync every 4 hours
  */
 export function initializeScheduledSync() {
-  const syncTimes = [8, 12, 16, 20]; // Hours in UTC
+  // Perform initial sync on startup
+  refreshCache().catch(error => {
+    console.error("[Scheduler] Error during initial sync:", error);
+  });
   
-  function scheduleNextSync() {
-    const now = new Date();
-    const currentHourUTC = now.getUTCHours();
-    const currentMinutesUTC = now.getUTCMinutes();
-    const currentSecondsUTC = now.getUTCSeconds();
-    
-    // Find the next sync time
-    let nextSyncHour = syncTimes.find(h => h > currentHourUTC);
-    let nextSyncDate: Date;
-    
-    if (nextSyncHour !== undefined) {
-      // Sync time is today
-      nextSyncDate = new Date();
-      nextSyncDate.setUTCHours(nextSyncHour, 0, 0, 0);
-    } else {
-      // Sync time is tomorrow
-      nextSyncDate = new Date();
-      nextSyncDate.setUTCDate(nextSyncDate.getUTCDate() + 1);
-      nextSyncDate.setUTCHours(syncTimes[0], 0, 0, 0);
-    }
-    
-    const timeUntilSync = nextSyncDate.getTime() - now.getTime();
-    
-    console.log(`[Scheduler] Next sync scheduled for ${nextSyncDate.toISOString()} (in ${Math.round(timeUntilSync / 1000 / 60)} minutes)`);
-    
-    setTimeout(() => {
-      console.log(`[Scheduler] Executing scheduled sync at ${new Date().toISOString()}`);
-      refreshCache().catch(error => {
-        console.error("[Scheduler] Error during scheduled sync:", error);
-      });
-      
-      // Schedule the next sync
-      scheduleNextSync();
-    }, timeUntilSync);
-  }
+  // Schedule periodic sync every 4 hours
+  setInterval(() => {
+    console.log(`[Scheduler] Executing scheduled sync at ${new Date().toISOString()}`);
+    refreshCache().catch(error => {
+      console.error("[Scheduler] Error during scheduled sync:", error);
+    });
+  }, SYNC_INTERVAL);
   
-  // Start scheduling
-  scheduleNextSync();
-  console.log("[Scheduler] Scheduled sync initialized with times: 8:00, 12:00, 16:00, 20:00 UTC");
+  console.log("[Scheduler] Scheduled sync initialized - syncing every 4 hours");
 }
 
 /**
  * Get cache statistics
  */
-export function getCacheStats() {
-  return {
-    tripsCount: cache.trips.length,
-    lastUpdated: cache.lastUpdated ? new Date(cache.lastUpdated).toISOString() : "Never",
-    isFresh: Date.now() - cache.lastUpdated < CACHE_DURATION,
-  };
+export async function getCacheStats() {
+  try {
+    const trips = await getAllTrips();
+    return {
+      tripsCount: trips.length,
+      lastUpdated: lastSyncTime ? new Date(lastSyncTime).toISOString() : "Never",
+      isFresh: Date.now() - lastSyncTime < SYNC_INTERVAL,
+    };
+  } catch (error) {
+    console.error("[Cache] Error getting cache stats:", error);
+    return {
+      tripsCount: 0,
+      lastUpdated: "Error",
+      isFresh: false,
+    };
+  }
 }

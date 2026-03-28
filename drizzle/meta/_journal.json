@@ -8,6 +8,13 @@
       "when": 1773854684328,
       "tag": "0000_sparkling_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1774699819096,
+      "tag": "0001_serious_silhouette",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,8 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
-import { getCachedTrips, refreshCache } from "./cacheService";
+import { getAllTrips, getParticipantsByTrip } from "./db";
+import { refreshCache } from "./cacheService";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -21,8 +22,19 @@ export const appRouter = router({
   trips: router({
     list: publicProcedure.query(async () => {
       try {
-        const trips = await getCachedTrips();
-        return trips;
+        const allTrips = await getAllTrips();
+        // Load participants for each trip
+        const tripsWithParticipants = await Promise.all(
+          allTrips.map(async (trip) => {
+            const participantsList = await getParticipantsByTrip(trip.id);
+            return {
+              ...trip,
+              participants: participantsList.length,
+              participantsList: participantsList,
+            };
+          })
+        );
+        return tripsWithParticipants;
       } catch (error) {
         console.error("Error loading trips:", error);
         throw new Error("Failed to load trips");

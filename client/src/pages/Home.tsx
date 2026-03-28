@@ -65,36 +65,13 @@ export default function Home() {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [cachedTrips, setCachedTrips] = useState<Trip[]>([]);
 
-  // Load trips from API
+  // Load trips from API (now loads from database on server)
   const { data: tripsData = [], isLoading, refetch } = trpc.trips.list.useQuery();
-
-  // Save trips to localStorage when they change
-  useEffect(() => {
-    if (tripsData.length > 0) {
-      localStorage.setItem('trips_cache', JSON.stringify(tripsData));
-      setCachedTrips(tripsData);
-    }
-  }, [tripsData]);
-
-  // Load trips from localStorage on mount
-  useEffect(() => {
-    const cached = localStorage.getItem('trips_cache');
-    if (cached) {
-      try {
-        setCachedTrips(JSON.parse(cached));
-      } catch (error) {
-        console.error('Error parsing cached trips:', error);
-      }
-    }
-  }, []);
   const refreshMutation = trpc.trips.refresh.useMutation();
   
   // Sort trips by date in ascending order
-  // Use API data if available, otherwise use cached data
-  const tripsToDisplay = tripsData.length > 0 ? tripsData : cachedTrips;
-  const trips = [...tripsToDisplay].sort((a, b) => {
+  const trips = [...tripsData].sort((a, b) => {
     return parseDateForSort(a.date) - parseDateForSort(b.date);
   });
 
@@ -220,7 +197,13 @@ export default function Home() {
           </div>
 
           {/* Trips grid */}
-          {!isLoading && trips.length > 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground font-inter text-lg">
+                Загрузка данных из базы данных...
+              </p>
+            </div>
+          ) : trips.length > 0 ? (
             <div>
               <h2 className="font-poppins font-semibold text-2xl text-foreground mb-6">
                 Выезды
