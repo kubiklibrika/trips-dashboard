@@ -1,5 +1,11 @@
 import axios from "axios";
 
+function getDashboardUrl(): string {
+  // Get the app URL from environment or use default
+  const appUrl = process.env.APP_URL || process.env.VITE_FRONTEND_FORGE_API_URL?.replace('/api', '') || 'https://tripsdash-y478acgk.manus.space';
+  return appUrl;
+}
+
 function getTelegramConfig() {
   return {
     token: process.env.TELEGRAM_BOT_TOKEN,
@@ -78,6 +84,10 @@ function formatMessage(message: TelegramMessage): string {
   } else {
     text = `<b>${message.title}</b>\n\n${message.content}`;
   }
+
+  // Add dashboard link
+  const dashboardUrl = getDashboardUrl();
+  text += `\n\n<a href="${dashboardUrl}">📊 Открыть дашборд</a>`;
 
   return text;
 }
