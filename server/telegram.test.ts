@@ -55,3 +55,35 @@ describe("Telegram Service", () => {
     expect(result).toBe(false);
   });
 });
+
+// Integration test: Real Telegram API connection
+describe("Telegram Service - Real API Connection", () => {
+  it("should successfully connect to Telegram API with real credentials", async () => {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    if (!token || !chatId) {
+      console.log("Skipping real API test: Telegram credentials not configured");
+      expect(true).toBe(true);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://api.telegram.org/bot${token}/sendMessage`,
+        {
+          chat_id: chatId,
+          text: "✅ Тест подключения Telegram API - новые credentials работают!",
+          parse_mode: "HTML",
+        },
+        { timeout: 10000 }
+      );
+
+      expect(response.data.ok).toBe(true);
+      console.log("✅ Telegram API connection test passed");
+    } catch (error: any) {
+      console.error("❌ Telegram API connection test failed:", error.response?.data || error.message);
+      throw error;
+    }
+  });
+});
