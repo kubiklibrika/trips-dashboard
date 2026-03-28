@@ -67,7 +67,8 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Load trips from API
-  const { data: tripsData = [], isLoading, error, refetch } = trpc.trips.list.useQuery();
+  const { data: tripsData = [], isLoading, refetch } = trpc.trips.list.useQuery();
+  const refreshMutation = trpc.trips.refresh.useMutation();
   
   // Sort trips by date in ascending order
   const trips = [...tripsData].sort((a, b) => {
@@ -84,10 +85,18 @@ export default function Home() {
     setSelectedTrip(null);
   };
 
+  const utils = trpc.useUtils();
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // Call refresh mutation to force update cache
+      await refreshMutation.mutateAsync();
+      
+      // Invalidate and refetch the trips list
+      await utils.trips.list.invalidate();
       await refetch();
+      
       toast.success('Данные обновлены', {
         description: 'Информация о выездах успешно загружена из Google Drive',
         duration: 3000,
@@ -219,7 +228,7 @@ export default function Home() {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground font-inter text-lg">
-                {isLoading ? 'Загрузка данных из Google Drive...' : error ? 'Ошибка при загрузке данных' : 'Нет данных о выездах'}
+                {isLoading ? 'Логружка данных из Google Drive...' : 'Нет данных о выездах'}
               </p>
             </div>
           )}
