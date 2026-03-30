@@ -208,3 +208,105 @@ export async function testTelegramConnection(): Promise<boolean> {
     return false;
   }
 }
+
+
+/**
+ * Send a message to all Telegram users
+ */
+export async function sendTelegramMessageToAllUsers(message: TelegramMessage): Promise<boolean> {
+  const { token } = getTelegramConfig();
+  
+  if (!token) {
+    console.warn("[Telegram] Bot token not configured");
+    return false;
+  }
+
+  try {
+    const { getAllTelegramUsers } = await import('./db');
+    const users = await getAllTelegramUsers();
+    
+    if (users.length === 0) {
+      console.log("[Telegram] No users to send message to");
+      return false;
+    }
+
+    const text = formatMessage(message);
+    const apiUrl = getTelegramApiUrl();
+    
+    let successCount = 0;
+    for (const user of users) {
+      try {
+        await axios.post(`${apiUrl}/sendMessage`, {
+          chat_id: user.chatId,
+          text: text,
+          parse_mode: "HTML",
+        }, {
+          timeout: 10000,
+        });
+        successCount++;
+      } catch (error) {
+        console.error(`[Telegram] Failed to send message to user ${user.chatId}:`, error);
+      }
+    }
+
+    console.log(`[Telegram] Message sent successfully to ${successCount}/${users.length} users: ${message.title}`);
+    return successCount > 0;
+  } catch (error) {
+    console.error("[Telegram] Error sending message to all users:", error);
+    return false;
+  }
+}
+
+/**
+ * Send notification about added participant to all users
+ */
+export async function notifyAddedParticipantToAllUsers(
+  tripTitle: string,
+  participantName: string,
+  paymentStatus: string
+): Promise<boolean> {
+  const statusText = paymentStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const content = `${participantName}\nСтатус: ${statusText}`;
+  
+  return sendTelegramMessageToAllUsers({
+    title: tripTitle,
+    content: content,
+    type: "added_participant",
+  });
+}
+
+/**
+ * Send notification about removed participant to all users
+ */
+export async function notifyRemovedParticipantToAllUsers(
+  tripTitle: string,
+  participantName: string
+): Promise<boolean> {
+  const content = `${participantName}`;
+  
+  return sendTelegramMessageToAllUsers({
+    title: tripTitle,
+    content: content,
+    type: "removed_participant",
+  });
+}
+
+/**
+ * Send notification about payment status change to all users
+ */
+export async function notifyPaymentStatusChangeToAllUsers(
+  tripTitle: string,
+  participantName: string,
+  oldStatus: string,
+  newStatus: string
+): Promise<boolean> {
+  const oldStatusText = oldStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const newStatusText = newStatus === "paid" ? "✅ Оплачено" : "❌ Не оплачено";
+  const content = `${participantName}\n${oldStatusText} → ${newStatusText}`;
+  
+  return sendTelegramMessageToAllUsers({
+    title: tripTitle,
+    content: content,
+    type: "payment_status_changed",
+  });
+}

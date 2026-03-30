@@ -3,6 +3,9 @@ import {
   notifyAddedParticipant,
   notifyRemovedParticipant,
   notifyPaymentStatusChange,
+  notifyAddedParticipantToAllUsers,
+  notifyRemovedParticipantToAllUsers,
+  notifyPaymentStatusChangeToAllUsers,
 } from "./telegramService";
 
 interface Participant {
@@ -117,7 +120,7 @@ export async function trackAndNotifyChanges(currentTrips: Trip[]): Promise<void>
           console.log(
             `[ChangeTracker] Added participant "${participant.name}" to "${currentTrip.title}"`
           );
-          await notifyAddedParticipant(
+          await notifyAddedParticipantToAllUsers(
             `${currentTrip.title} (${currentTrip.date})`,
             participant.name,
             participant.paymentStatus
@@ -129,7 +132,7 @@ export async function trackAndNotifyChanges(currentTrips: Trip[]): Promise<void>
           console.log(
             `[ChangeTracker] Removed participant "${participant.name}" from "${currentTrip.title}"`
           );
-          await notifyRemovedParticipant(`${currentTrip.title} (${currentTrip.date})`, participant.name);
+          await notifyRemovedParticipantToAllUsers(`${currentTrip.title} (${currentTrip.date})`, participant.name);
         }
 
         // Notify about payment status changes (one message per change)
@@ -137,7 +140,7 @@ export async function trackAndNotifyChanges(currentTrips: Trip[]): Promise<void>
           console.log(
             `[ChangeTracker] Payment status changed for "${change.name}" in "${currentTrip.title}": ${change.oldStatus} -> ${change.newStatus}`
           );
-          await notifyPaymentStatusChange(
+          await notifyPaymentStatusChangeToAllUsers(
             `${currentTrip.title} (${currentTrip.date})`,
             change.name,
             change.oldStatus,

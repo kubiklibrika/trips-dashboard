@@ -15,6 +15,13 @@
       "when": 1774699819096,
       "tag": "0001_serious_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1774893880548,
+      "tag": "0002_bent_argent",
+      "breakpoints": true
     }
   ]
 }

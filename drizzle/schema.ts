@@ -51,3 +51,16 @@ export const participants = mysqlTable("participants", {
 
 export type Participant = typeof participants.$inferSelect;
 export type InsertParticipant = typeof participants.$inferInsert;
+
+// Telegram users table
+export const telegramUsers = mysqlTable("telegramUsers", {
+  id: int("id").autoincrement().primaryKey(),
+  chatId: varchar("chatId", { length: 100 }).notNull().unique(),
+  firstName: varchar("firstName", { length: 255 }),
+  username: varchar("username", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TelegramUser = typeof telegramUsers.$inferSelect;
+export type InsertTelegramUser = typeof telegramUsers.$inferInsert;

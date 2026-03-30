@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, trips, participants, InsertTrip, InsertParticipant, Trip, Participant } from "../drizzle/schema";
+import { InsertUser, users, trips, participants, InsertTrip, InsertParticipant, Trip, Participant, telegramUsers, TelegramUser, InsertTelegramUser } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -237,5 +237,58 @@ export async function clearAllTripsAndParticipants(): Promise<boolean> {
   } catch (error) {
     console.error("[Database] Failed to clear data:", error);
     return false;
+  }
+}
+
+// Telegram users queries
+export async function addTelegramUser(user: InsertTelegramUser): Promise<TelegramUser | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot add telegram user: database not available");
+    return null;
+  }
+
+  try {
+    await db.insert(telegramUsers).values(user).onDuplicateKeyUpdate({
+      set: {
+        firstName: user.firstName,
+        username: user.username,
+      },
+    });
+    return user as TelegramUser;
+  } catch (error) {
+    console.error("[Database] Failed to add telegram user:", error);
+    return null;
+  }
+}
+
+export async function getAllTelegramUsers(): Promise<TelegramUser[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get telegram users: database not available");
+    return [];
+  }
+
+  try {
+    return await db.select().from(telegramUsers);
+  } catch (error) {
+    console.error("[Database] Failed to get telegram users:", error);
+    return [];
+  }
+}
+
+export async function getTelegramUserByChatId(chatId: string): Promise<TelegramUser | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get telegram user: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.select().from(telegramUsers).where(eq(telegramUsers.chatId, chatId)).limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get telegram user:", error);
+    return null;
   }
 }
