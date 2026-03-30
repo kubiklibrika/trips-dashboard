@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: trips-dashboard-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-trips_dashboard}
+      MYSQL_USER: ${MYSQL_USER:-trips_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-trips_password}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - trips-network
+
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trips-dashboard-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mysql://${MYSQL_USER:-trips_user}:${MYSQL_PASSWORD:-trips_password}@db:3306/${MYSQL_DATABASE:-trips_dashboard}
+      
+      # OAuth configuration
+      VITE_APP_ID: ${VITE_APP_ID}
+      OAUTH_SERVER_URL: ${OAUTH_SERVER_URL}
+      VITE_OAUTH_PORTAL_URL: ${VITE_OAUTH_PORTAL_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      OWNER_OPEN_ID: ${OWNER_OPEN_ID}
+      OWNER_NAME: ${OWNER_NAME}
+      
+      # Google Drive configuration
+      GOOGLE_DRIVE_CREDENTIALS: ${GOOGLE_DRIVE_CREDENTIALS}
+      
+      # Manus API configuration
+      BUILT_IN_FORGE_API_URL: ${BUILT_IN_FORGE_API_URL}
+      BUILT_IN_FORGE_API_KEY: ${BUILT_IN_FORGE_API_KEY}
+      VITE_FRONTEND_FORGE_API_URL: ${VITE_FRONTEND_FORGE_API_URL}
+      VITE_FRONTEND_FORGE_API_KEY: ${VITE_FRONTEND_FORGE_API_KEY}
+      
+      # Analytics
+      VITE_ANALYTICS_ENDPOINT: ${VITE_ANALYTICS_ENDPOINT}
+      VITE_ANALYTICS_WEBSITE_ID: ${VITE_ANALYTICS_WEBSITE_ID}
+      
+      # App configuration
+      VITE_APP_TITLE: ${VITE_APP_TITLE:-Дашборд выездов}
+      VITE_APP_LOGO: ${VITE_APP_LOGO}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+    
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    networks:
+      - trips-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  trips-network:
+    driver: bridge
