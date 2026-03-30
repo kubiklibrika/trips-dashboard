@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy with Let's Encrypt
   nginx:
     build:
       context: ./nginx
@@ -11,15 +11,16 @@ services:
       app:
         condition: service_started
     ports:
-      - "${NGINX_HTTP_PORT:-80}:80"
-      - "${NGINX_HTTPS_PORT:-443}:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - certbot_data:/var/www/certbot:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
     networks:
       - trips-network
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
@@ -32,21 +33,20 @@ services:
     image: mysql:8.0
     container_name: trips-dashboard-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-trips_dashboard}
       MYSQL_USER: ${MYSQL_USER:-trips_user}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-trips_password}
-    ports:
-      - "${DB_PORT:-3306}:3306"
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+      - mysql_backups:/backups
+    networks:
+      - trips-network
+    restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
-    networks:
-      - trips-network
-    restart: unless-stopped
 
   # Application
   app:
@@ -60,7 +60,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: mysql://${MYSQL_USER:-trips_user}:${MYSQL_PASSWORD:-trips_password}@db:3306/${MYSQL_DATABASE:-trips_dashboard}
+      DATABASE_URL: mysql://${MYSQL_USER:-trips_user}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE:-trips_dashboard}
       
       # OAuth configuration
       VITE_APP_ID: ${VITE_APP_ID}
@@ -86,11 +86,11 @@ services:
       # App configuration
       VITE_APP_TITLE: ${VITE_APP_TITLE:-Дашборд выездов}
       VITE_APP_LOGO: ${VITE_APP_LOGO}
-      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_URL: ${APP_URL}
     
     networks:
       - trips-network
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s
@@ -98,7 +98,7 @@ services:
       retries: 3
       start_period: 10s
 
-  # Optional: Certbot for Let's Encrypt SSL certificates
+  # Certbot for Let's Encrypt SSL certificates
   certbot:
     image: certbot/certbot:latest
     container_name: trips-dashboard-certbot
@@ -108,12 +108,11 @@ services:
     entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done;'
     networks:
       - trips-network
-    restart: unless-stopped
-    profiles:
-      - certbot
+    restart: always
 
 volumes:
   mysql_data:
+  mysql_backups:
   certbot_data:
 
 networks:
