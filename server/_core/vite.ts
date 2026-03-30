@@ -20,8 +20,28 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
+  // CRITICAL: Handle 404 for /api routes BEFORE Vite middleware
+  // This ensures /api/* requests don't fall through to Vite's index.html fallback
+  app.use("/api/", (req, res, next) => {
+    // If we reach here, the /api/* route wasn't handled by Express
+    // Return 404 instead of letting Vite serve index.html
+    res.status(404).json({ error: "API route not found" });
+  });
+
+  // CRITICAL: Skip Vite for /api routes - they must be handled by Express
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+    vite.middlewares(req, res, next);
+  });
+  
   app.use("*", async (req, res, next) => {
+    // Skip for API routes
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+    
     const url = req.originalUrl;
 
     try {
