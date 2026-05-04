@@ -88,30 +88,33 @@ export function SheepLoader() {
         <svg viewBox="0 0 160 120">
           <g className="sheep">
 
-            {/* BODY */}
+            {/* BODY (traced closer to original) */}
             <path className="stroke" d="
-              M60 80
-              C45 78, 40 65, 48 58
-              C38 50, 50 38, 65 42
-              C68 32, 85 35, 92 45
-              C108 40, 118 55, 108 65
-              C120 72, 100 88, 82 82
-              C75 92, 65 90, 60 80
+              M58 78
+              C50 76, 45 72, 44 66
+              C38 64, 36 58, 40 54
+              C36 48, 42 42, 50 44
+              C52 36, 60 34, 66 38
+              C70 34, 80 34, 86 40
+              C94 38, 100 44, 98 50
+              C104 54, 102 62, 96 66
+              C98 72, 90 78, 82 76
+              C76 82, 64 82, 58 78
               Z" />
 
-            {/* HEAD */}
+            {/* HEAD (traced) */}
             <path className="stroke" d="
-              M38 65
-              C28 60, 30 48, 40 45
-              C50 43, 55 52, 48 62
-              C45 68, 42 70, 38 65
+              M36 64
+              C30 60, 30 52, 36 48
+              C42 46, 48 50, 46 58
+              C44 64, 40 66, 36 64
               Z" />
 
             {/* EAR */}
-            <path className="stroke" d="M34 48 Q22 42 28 55" />
+            <path className="stroke" d="M34 48 C26 44, 26 52, 30 54" />
 
             {/* EYE */}
-            <circle cx="45" cy="55" r="2" fill="#2b4c7e" />
+            <circle cx="42" cy="55" r="2" fill="#2b4c7e" />
 
             {/* LEGS */}
             <line className="stroke leg" x1="78" y1="82" x2="78" y2="110" />
