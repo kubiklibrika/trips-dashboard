@@ -70,6 +70,14 @@ export default function Home() {
   // Load trips from API (now loads from database on server)
   const { data: tripsData = [], isLoading, refetch } = trpc.trips.list.useQuery();
   const refreshMutation = trpc.trips.refresh.useMutation();
+  const [isParsingGoogleDrive, setIsParsingGoogleDrive] = useState(true);
+
+  // Check if we're still loading data from Google Drive on initial mount
+  useEffect(() => {
+    if (!isLoading) {
+      setIsParsingGoogleDrive(false);
+    }
+  }, [isLoading]);
   
   // Sort trips by date in ascending order
   const trips = [...tripsData].sort((a, b) => {
@@ -90,8 +98,9 @@ export default function Home() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    setIsParsingGoogleDrive(true);
     try {
-      // Call refresh mutation to force update cache
+      // Call refresh mutation to force update cache from Google Drive
       await refreshMutation.mutateAsync();
       
       // Invalidate and refetch the trips list
@@ -109,13 +118,14 @@ export default function Home() {
       });
     } finally {
       setIsRefreshing(false);
+      setIsParsingGoogleDrive(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Loading state - show sheep loader */}
-      {isLoading && <SheepLoader />}
+      {/* Loading state - show sheep loader while parsing Google Drive */}
+      {(isLoading || isParsingGoogleDrive) && <SheepLoader />}
 
       {/* Background image with overlay */}
       <div 
