@@ -66,18 +66,27 @@ export default function Home() {
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [minLoadingTimeReached, setMinLoadingTimeReached] = useState(false);
 
   // Load trips from API (now loads from database on server)
   const { data: tripsData = [], isLoading, refetch } = trpc.trips.list.useQuery();
   const refreshMutation = trpc.trips.refresh.useMutation();
   const [isParsingGoogleDrive, setIsParsingGoogleDrive] = useState(true);
 
+  // Enforce minimum 3 second loading time
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingTimeReached(true);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Check if we're still loading data from Google Drive on initial mount
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && minLoadingTimeReached) {
       setIsParsingGoogleDrive(false);
     }
-  }, [isLoading]);
+  }, [isLoading, minLoadingTimeReached]);
   
   // Sort trips by date in ascending order
   const trips = [...tripsData].sort((a, b) => {
@@ -99,9 +108,22 @@ export default function Home() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     setIsParsingGoogleDrive(true);
+    setMinLoadingTimeReached(false);
+    
+    // Enforce minimum 3 second loading time for refresh
+    const refreshStartTime = Date.now();
+    
     try {
       // Call refresh mutation to force update cache from Google Drive
       await refreshMutation.mutateAsync();
+      
+      // Calculate elapsed time and wait if necessary to reach 3 seconds
+      const elapsedTime = Date.now() - refreshStartTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
       
       // Invalidate and refetch the trips list
       await utils.trips.list.invalidate();
@@ -119,6 +141,7 @@ export default function Home() {
     } finally {
       setIsRefreshing(false);
       setIsParsingGoogleDrive(false);
+      setMinLoadingTimeReached(true);
     }
   };
 
