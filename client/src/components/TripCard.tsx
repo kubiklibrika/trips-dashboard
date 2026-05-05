@@ -65,14 +65,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
 
   const locationIcon = getLocationIcon(title);
 
-  // Generate dot grid for payment visualization
-  const totalDots = Math.min(participants, 12);
-  const dotsPerRow = 6;
-  const dots = [];
-  
-  for (let i = 0; i < totalDots; i++) {
-    dots.push(i < paidCount ? 'paid' : 'unpaid');
-  }
+
 
   // Calculate program percentages
   const beginnerPercent = participants > 0 ? Math.round((beginnerCount / participants) * 100) : 0;
@@ -117,49 +110,53 @@ export function TripCard({ title, date, participants, participantsList = [], onO
           </p>
         </div>
 
-        {/* Payment status dot grid */}
+        {/* Payment status bar */}
         {participantsList.length > 0 && (
           <>
-            {/* Dot grid section */}
-            <div className="mb-4 flex items-center justify-between">
-              {/* Left: Paid count label */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                  <span className="text-xs text-muted-foreground font-inter font-semibold">
-                    Оплачено
-                  </span>
-                </div>
-                <p className="font-poppins font-bold text-lg text-green-600">
-                  {paidCount}
-                </p>
-              </div>
-
-              {/* Center: Dot grid */}
-              <div className="flex flex-wrap gap-1.5 justify-center max-w-[120px]">
-                {dots.map((status, idx) => (
+            {/* Payment bar section */}
+            <div className="mb-4 space-y-2">
+              <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
+                Статус оплаты
+              </p>
+              
+              {/* Horizontal payment bar */}
+              <div className="flex h-8 rounded-lg overflow-hidden shadow-sm border border-border/20">
+                {paidCount > 0 && (
                   <div
-                    key={idx}
-                    className={`w-3 h-3 rounded-full transition-transform hover:scale-125 ${
-                      status === 'paid' 
-                        ? 'bg-green-500 shadow-sm' 
-                        : 'bg-red-500 shadow-sm'
-                    }`}
-                  />
-                ))}
+                    className="bg-green-500 flex items-center justify-center transition-all duration-300"
+                    style={{ width: `${(paidCount / participants) * 100}%` }}
+                  >
+                    {(paidCount / participants) * 100 > 15 && (
+                      <span className="text-white text-xs font-bold">
+                        {Math.round((paidCount / participants) * 100)}%
+                      </span>
+                    )}
+                  </div>
+                )}
+                {unpaidCount > 0 && (
+                  <div
+                    className="bg-red-500 flex items-center justify-center transition-all duration-300"
+                    style={{ width: `${(unpaidCount / participants) * 100}%` }}
+                  >
+                    {(unpaidCount / participants) * 100 > 15 && (
+                      <span className="text-white text-xs font-bold">
+                        {Math.round((unpaidCount / participants) * 100)}%
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Right: Unpaid count label */}
-              <div className="flex flex-col items-center">
-                <div className="flex items-center gap-1 mb-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                  <span className="text-xs text-muted-foreground font-inter font-semibold">
-                    Не оплачено
-                  </span>
+              {/* Payment labels */}
+              <div className="flex justify-between text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-muted-foreground">Оплачено ({paidCount})</span>
                 </div>
-                <p className="font-poppins font-bold text-lg text-red-600">
-                  {unpaidCount}
-                </p>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <span className="text-muted-foreground">Не оплачено ({unpaidCount})</span>
+                </div>
               </div>
             </div>
 
