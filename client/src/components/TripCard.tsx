@@ -27,9 +27,9 @@ export function TripCard({ title, date, participants, participantsList = [], onO
   // Determine background based on if trip has passed
   const getBackgroundStyle = (isPassed: boolean) => {
     if (isPassed) {
-      return 'bg-gradient-to-br from-gray-100/50 to-gray-50/30 border-gray-200/40';
+      return 'bg-gradient-to-br from-gray-200 to-gray-100 border-gray-300';
     }
-    return 'bg-gradient-to-br from-blue-50/40 to-cyan-50/20 border-blue-200/30';
+    return 'bg-gradient-to-br from-blue-100 to-cyan-50 border-blue-300';
   };
 
   const backgroundStyle = getBackgroundStyle(isPassed);
