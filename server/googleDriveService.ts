@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 interface Participant {
   name: string;
   paymentStatus: string;
+  program: string;
 }
 
 interface Trip {
@@ -151,11 +152,20 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       paymentStatus = "unpaid";
     }
 
-    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus}`);
+    // Get program from "Программа" column (column L)
+    let program = "unknown";
+    const programValue = (row["Программа"] || "").toString().trim();
+    
+    if (programValue) {
+      program = programValue;
+    }
+
+    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}"`);
 
     participants.push({
       name,
       paymentStatus,
+      program,
     });
   }
 

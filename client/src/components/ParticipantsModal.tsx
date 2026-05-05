@@ -2,7 +2,7 @@
  * ParticipantsModal Component
  * 
  * Design Philosophy: Neomorphic modal with smooth animations
- * - Displays list of participants for a trip with payment status
+ * - Displays list of participants for a trip with payment status and program
  * - Search field to filter participants by name
  * - Filter buttons for payment status
  * - Smooth entrance/exit animations
@@ -15,6 +15,7 @@ import { X, Users, Search, CheckCircle2, AlertCircle } from 'lucide-react';
 interface Participant {
   name: string;
   paymentStatus: string;
+  program: string;
 }
 
 interface ParticipantsModalProps {
@@ -66,6 +67,13 @@ export function ParticipantsModal({
     return { paid, unpaid, total: participants.length };
   }, [participants]);
 
+  // Calculate program statistics
+  const programStats = useMemo(() => {
+    const beginners = participants.filter(p => p.program && p.program.toLowerCase().includes('с нуля')).length;
+    const others = participants.filter(p => p.program && !p.program.toLowerCase().includes('с нуля')).length;
+    return { beginners, others };
+  }, [participants]);
+
   if (!isOpen) return null;
 
   const getPaymentBadge = (status: string) => {
@@ -85,6 +93,26 @@ export function ParticipantsModal({
       );
     }
     return null;
+  };
+
+  const getProgramBadge = (program: string) => {
+    if (!program) return null;
+    
+    const isBeginner = program.toLowerCase().includes('с нуля');
+    
+    if (isBeginner) {
+      return (
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 rounded-full">
+          <span className="text-xs font-medium text-blue-700">С нуля</span>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 rounded-full">
+          <span className="text-xs font-medium text-purple-700">{program}</span>
+        </div>
+      );
+    }
   };
 
   return (
@@ -128,7 +156,7 @@ export function ParticipantsModal({
 
           {/* Stats section */}
           <div className="px-6 pt-4 pb-2 border-b border-border/30">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div className="p-3 bg-secondary/30 rounded-lg">
                 <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-1">
                   Всего
@@ -145,12 +173,22 @@ export function ParticipantsModal({
                   {stats.paid}
                 </p>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div className="p-3 bg-red-50 rounded-lg">
                 <p className="text-xs text-red-700 font-inter uppercase tracking-wider mb-1">
                   Не оплачено
                 </p>
                 <p className="font-poppins font-semibold text-lg text-red-600">
                   {stats.unpaid}
+                </p>
+              </div>
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="text-xs text-blue-700 font-inter uppercase tracking-wider mb-1">
+                  С нуля
+                </p>
+                <p className="font-poppins font-semibold text-lg text-blue-600">
+                  {programStats.beginners}
                 </p>
               </div>
             </div>
@@ -232,11 +270,17 @@ export function ParticipantsModal({
                               {originalIndex + 1}
                             </span>
                           </div>
-                          <span className="font-inter text-foreground truncate">
-                            {participant.name}
-                          </span>
+                          <div className="flex-1 min-w-0">
+                            <span className="font-inter text-foreground truncate block">
+                              {participant.name}
+                            </span>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {participant.program}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 flex gap-2">
+                          {getProgramBadge(participant.program)}
                           {getPaymentBadge(participant.paymentStatus)}
                         </div>
                       </li>

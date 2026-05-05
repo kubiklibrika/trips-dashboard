@@ -45,6 +45,7 @@ export const participants = mysqlTable("participants", {
   tripId: int("tripId").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   paymentStatus: varchar("paymentStatus", { length: 50 }).notNull(),
+  program: varchar("program", { length: 100 }).default("unknown").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
