@@ -85,19 +85,14 @@ export function TripCard({ title, date, participants, participantsList = [], onO
                    ${backgroundStyle}`}
         onClick={onOpenModal}
       >
-        {/* Header with location icon and title */}
-        <div className="flex items-start gap-3 mb-4">
-          <div className="text-4xl flex-shrink-0">
-            {locationIcon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-poppins font-bold text-base text-foreground line-clamp-2 leading-tight">
-              {title}
-            </h3>
-            <p className="text-xs text-muted-foreground font-inter mt-1.5 flex items-center gap-1">
-              📅 {date}
-            </p>
-          </div>
+        {/* Header with title and date */}
+        <div className="flex-1 min-w-0 mb-4">
+          <h3 className="font-poppins font-bold text-base text-foreground line-clamp-2 leading-tight">
+            {title}
+          </h3>
+          <p className="text-xs text-muted-foreground font-inter mt-1.5 flex items-center gap-1">
+            📅 {date}
+          </p>
         </div>
 
         {/* Central participants number - Large and prominent */}
