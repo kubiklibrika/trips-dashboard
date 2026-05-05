@@ -10,10 +10,11 @@
  * - Smooth transitions: 0.2s ease-out
  * - Click to open participants modal
  * - Location-based colors:
- *   - Turkey: Cyan/Blue gradient
- *   - Dagestan: Amber/Orange gradient
- *   - Chegem: Slate/Blue gradient
- *   - Default: Slate gradient
+ *   - Turkey: Cyan/Blue gradient (future)
+ *   - Dagestan: Amber/Orange gradient (future)
+ *   - Chegem: Slate/Blue gradient (future)
+ *   - Default: Blue gradient (future)
+ *   - Passed trips: Gray gradient
  */
 
 import { CheckCircle2, AlertCircle } from 'lucide-react';
@@ -30,11 +31,17 @@ interface TripCardProps {
   participants: number;
   participantsList?: Participant[];
   onOpenModal?: () => void;
+  isPassed?: boolean;
 }
 
-export function TripCard({ title, date, participants, participantsList = [], onOpenModal }: TripCardProps) {
-  // Determine background based on location
-  const getBackgroundStyle = (title: string) => {
+export function TripCard({ title, date, participants, participantsList = [], onOpenModal, isPassed = false }: TripCardProps) {
+  // Determine background based on location and if trip has passed
+  const getBackgroundStyle = (title: string, isPassed: boolean) => {
+    // If trip has passed, use gray color
+    if (isPassed) {
+      return 'from-gray-300/25 via-gray-300/20 to-gray-400/15';
+    }
+    
     const lowerTitle = title.toLowerCase();
     
     if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
@@ -45,10 +52,10 @@ export function TripCard({ title, date, participants, participantsList = [], onO
       return 'from-slate-400/20 via-blue-400/15 to-slate-500/10';
     }
     
-    return 'from-slate-300/15 via-slate-300/10 to-slate-400/5';
+    return 'from-blue-300/25 via-blue-300/20 to-sky-300/15';
   };
 
-  const backgroundGradient = getBackgroundStyle(title);
+  const backgroundGradient = getBackgroundStyle(title, isPassed);
 
   // Calculate payment stats
   const paidCount = participantsList.filter(

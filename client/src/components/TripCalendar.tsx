@@ -4,7 +4,8 @@
  * Displays a calendar view of trips with highlighted dates
  * - Shows only months that have trips
  * - Highlights dates corresponding to trip dates
- * - Color-coded by trip location
+ * - Color-coded by trip location for future trips
+ * - Gray color for past trips
  * - Liquid Glass style
  */
 
@@ -20,6 +21,7 @@ interface Trip {
 
 interface TripCalendarProps {
   trips: Trip[];
+  isTripsDatePassed?: (dateStr: string) => boolean;
 }
 
 const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -65,8 +67,13 @@ function parseTripDates(dateStr: string): { startDay: number; endDay: number; mo
   return null;
 }
 
-// Get color based on trip location
-function getColorForTrip(title: string): string {
+// Get color based on trip location and if it has passed
+function getColorForTrip(title: string, isPassed: boolean): string {
+  // If trip has passed, use gray
+  if (isPassed) {
+    return 'bg-gray-400';
+  }
+
   const lowerTitle = title.toLowerCase();
 
   if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
@@ -77,7 +84,7 @@ function getColorForTrip(title: string): string {
     return 'bg-slate-400';
   }
 
-  return 'bg-slate-300';
+  return 'bg-blue-400';
 }
 
 // Get days in month
@@ -90,7 +97,7 @@ function getFirstDayOfMonth(month: number, year: number = 2026): number {
   return new Date(year, month - 1, 1).getDay();
 }
 
-export function TripCalendar({ trips }: TripCalendarProps) {
+export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
   const monthsWithTrips = useMemo(() => {
     const months: { [key: number]: Set<number> } = {};
     const tripsByMonth: { [key: number]: Trip[] } = {};
@@ -136,8 +143,10 @@ export function TripCalendar({ trips }: TripCalendarProps) {
           const highlightedDays = monthsWithTrips.months[month];
           const monthTrips = monthsWithTrips.tripsByMonth[month];
 
-          // Get color from first trip in month
-          const monthColor = monthTrips.length > 0 ? getColorForTrip(monthTrips[0].title) : 'bg-slate-300';
+          // Get color from first trip in month (considering if it has passed)
+          const monthColor = monthTrips.length > 0 
+            ? getColorForTrip(monthTrips[0].title, isTripsDatePassed ? isTripsDatePassed(monthTrips[0].date) : false)
+            : 'bg-slate-300';
 
           return (
             <div

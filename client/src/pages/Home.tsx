@@ -11,6 +11,7 @@
  * - Data loaded from Google Drive API
  * - Trips sorted by date in ascending order
  * - Manual refresh button for updating data
+ * - Past trips shown in gray, future trips in blue
  */
 
 import { useEffect, useState } from 'react';
@@ -61,6 +62,33 @@ function parseDateForSort(dateStr: string): number {
   
   // Return comparable number: month * 100 + day
   return month * 100 + day;
+}
+
+// Check if trip date has passed (based on current date)
+function isTripsDatePassed(dateStr: string): boolean {
+  if (!dateStr) return false;
+  
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-12
+  const currentDay = now.getDate();
+  const currentDateNum = currentMonth * 100 + currentDay;
+  
+  const parts = dateStr.toLowerCase().split(' ');
+  if (parts.length < 2) return false;
+  
+  const dayPart = parts[0];
+  const dayMatch = dayPart.match(/\d+/g);
+  
+  if (!dayMatch || dayMatch.length === 0) return false;
+  
+  // Get the last day (end date) from the range
+  const endDay = parseInt(dayMatch[dayMatch.length - 1]);
+  const monthName = parts[parts.length - 1];
+  const month = monthMap[monthName] || 0;
+  
+  const endDateNum = month * 100 + endDay;
+  
+  return endDateNum < currentDateNum;
 }
 
 export default function Home() {
@@ -261,13 +289,14 @@ export default function Home() {
                       participants={trip.participants}
                       participantsList={trip.participantsList}
                       onOpenModal={() => handleOpenModal(trip)}
+                      isPassed={isTripsDatePassed(trip.date)}
                     />
                   </div>
                 ))}
               </div>
 
               {/* Trip Calendar */}
-              <TripCalendar trips={trips} />
+              <TripCalendar trips={trips} isTripsDatePassed={isTripsDatePassed} />
             </div>
           ) : (
             <div className="text-center py-12">
