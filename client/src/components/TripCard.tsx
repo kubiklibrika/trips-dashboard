@@ -128,7 +128,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
                   >
                     {(paidCount / participants) * 100 > 15 && (
                       <span className="text-white text-xs font-bold">
-                        {Math.round((paidCount / participants) * 100)}%
+                        {paidCount}
                       </span>
                     )}
                   </div>
@@ -140,7 +140,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
                   >
                     {(unpaidCount / participants) * 100 > 15 && (
                       <span className="text-white text-xs font-bold">
-                        {Math.round((unpaidCount / participants) * 100)}%
+                        {unpaidCount}
                       </span>
                     )}
                   </div>
@@ -175,7 +175,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
                   >
                     {beginnerPercent > 15 && (
                       <span className="text-white text-xs font-bold">
-                        {beginnerPercent}%
+                        {beginnerCount}
                       </span>
                     )}
                   </div>
@@ -187,7 +187,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
                   >
                     {otherPercent > 15 && (
                       <span className="text-white text-xs font-bold">
-                        {otherPercent}%
+                        {otherProgramCount}
                       </span>
                     )}
                   </div>
