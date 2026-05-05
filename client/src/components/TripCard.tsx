@@ -1,23 +1,15 @@
 /**
  * TripCard Component
  * 
- * Design Philosophy: Liquid Glass style with frosted glass effect and location-based backgrounds
- * - Backdrop blur for glass effect
- * - Semi-transparent background with gradient based on location
- * - Soft shadow for depth
- * - Rounded corners: 16px
- * - Hover effect: Enhanced glass effect with more blur
- * - Smooth transitions: 0.2s ease-out
+ * Design Philosophy: Clean and minimal with focus on information hierarchy
+ * - Simplified layout with better spacing
+ * - Minimalist stat boxes without excessive styling
+ * - Subtle colors that don't overwhelm
+ * - Smooth interactions and hover effects
  * - Click to open participants modal
- * - Location-based colors:
- *   - Turkey: Cyan/Blue gradient (future)
- *   - Dagestan: Amber/Orange gradient (future)
- *   - Chegem: Slate/Blue gradient (future)
- *   - Default: Blue gradient (future)
- *   - Passed trips: Gray gradient
  */
 
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface Participant {
   name: string;
@@ -35,27 +27,15 @@ interface TripCardProps {
 }
 
 export function TripCard({ title, date, participants, participantsList = [], onOpenModal, isPassed = false }: TripCardProps) {
-  // Determine background based on location and if trip has passed
-  const getBackgroundStyle = (title: string, isPassed: boolean) => {
-    // If trip has passed, use gray color
+  // Determine background based on if trip has passed
+  const getBackgroundStyle = (isPassed: boolean) => {
     if (isPassed) {
-      return 'from-gray-300/25 via-gray-300/20 to-gray-400/15';
+      return 'bg-gradient-to-br from-gray-100/50 to-gray-50/30 border-gray-200/40';
     }
-    
-    const lowerTitle = title.toLowerCase();
-    
-    if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
-      return 'from-cyan-300/25 via-blue-300/20 to-sky-300/15';
-    } else if (lowerTitle.includes('дагестан')) {
-      return 'from-amber-300/25 via-orange-300/20 to-yellow-300/15';
-    } else if (lowerTitle.includes('чегем')) {
-      return 'from-slate-400/20 via-blue-400/15 to-slate-500/10';
-    }
-    
-    return 'from-blue-300/25 via-blue-300/20 to-sky-300/15';
+    return 'bg-gradient-to-br from-blue-50/40 to-cyan-50/20 border-blue-200/30';
   };
 
-  const backgroundGradient = getBackgroundStyle(title, isPassed);
+  const backgroundStyle = getBackgroundStyle(isPassed);
 
   // Calculate payment stats
   const paidCount = participantsList.filter(
@@ -74,106 +54,81 @@ export function TripCard({ title, date, participants, participantsList = [], onO
   ).length;
 
   return (
-    <div className="group relative">
-      {/* Card container with Liquid Glass styling and location-based background */}
+    <div className="group relative h-full">
+      {/* Card container - Clean and minimal */}
       <div
-        className={`relative rounded-[16px] p-5
-                   shadow-[0_8px_32px_rgba(0,0,0,0.1)]
-                   border border-white/30
-                   hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]
+        className={`relative rounded-xl p-4 h-full
+                   shadow-sm hover:shadow-md
+                   border
                    transition-all duration-200 ease-out
-                   cursor-pointer h-full
-                   backdrop-blur-md
-                   bg-gradient-to-br ${backgroundGradient}
-                   hover:backdrop-blur-lg`}
+                   cursor-pointer
+                   backdrop-blur-sm
+                   ${backgroundStyle}`}
         onClick={onOpenModal}
       >
-        {/* Header */}
+        {/* Header section */}
         <div className="mb-4">
-          <h3 className="font-poppins font-semibold text-sm text-foreground line-clamp-2">
+          <h3 className="font-poppins font-semibold text-sm text-foreground line-clamp-2 leading-tight">
             {title}
           </h3>
-          <p className="text-xs text-muted-foreground font-inter mt-1">
+          <p className="text-xs text-muted-foreground font-inter mt-1.5">
             {date}
           </p>
         </div>
 
-        {/* Participants count - Large display */}
+        {/* Main participants count */}
         <div className="mb-4 pb-4 border-b border-border/20">
-          <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-2">
-            Участники
-          </p>
-          <p className="font-poppins font-bold text-3xl text-primary">
-            {participants}
-          </p>
+          <div className="flex items-baseline gap-2">
+            <p className="font-poppins font-bold text-2xl text-primary">
+              {participants}
+            </p>
+            <p className="text-xs text-muted-foreground font-inter">
+              участников
+            </p>
+          </div>
         </div>
 
-        {/* Payment Stats */}
+        {/* Stats grid - Minimal style */}
         {participantsList.length > 0 && (
-          <>
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              {/* Paid */}
-              <div className="bg-green-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-                  <p className="text-xs text-green-700 font-inter font-semibold">
-                    Оплачено
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-green-600">
-                  {paidCount}
-                </p>
+          <div className="space-y-2">
+            {/* Payment row */}
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <span className="text-muted-foreground">Оплачено</span>
               </div>
-
-              {/* Unpaid */}
-              <div className="bg-red-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <AlertCircle className="w-3.5 h-3.5 text-red-600" />
-                  <p className="text-xs text-red-700 font-inter font-semibold">
-                    Не оплачено
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-red-600">
-                  {unpaidCount}
-                </p>
-              </div>
+              <span className="font-semibold text-foreground">{paidCount}</span>
             </div>
 
-            {/* Program Stats */}
-            <div className="grid grid-cols-2 gap-2">
-              {/* Beginners */}
-              <div className="bg-blue-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <p className="text-xs text-blue-700 font-inter font-semibold">
-                    С нуля
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-blue-600">
-                  {beginnerCount}
-                </p>
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                <span className="text-muted-foreground">Не оплачено</span>
               </div>
-
-              {/* Other programs */}
-              <div className="bg-purple-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <p className="text-xs text-purple-700 font-inter font-semibold">
-                    Другие
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-purple-600">
-                  {otherProgramCount}
-                </p>
-              </div>
+              <span className="font-semibold text-foreground">{unpaidCount}</span>
             </div>
-          </>
+
+            {/* Program row */}
+            <div className="flex items-center justify-between text-xs pt-1 border-t border-border/20">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="text-muted-foreground">С нуля</span>
+              </div>
+              <span className="font-semibold text-foreground">{beginnerCount}</span>
+            </div>
+
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                <span className="text-muted-foreground">Другие</span>
+              </div>
+              <span className="font-semibold text-foreground">{otherProgramCount}</span>
+            </div>
+          </div>
         )}
 
-        {/* Click hint */}
-        <div className="absolute inset-0 rounded-[16px] bg-black/0 group-hover:bg-black/5 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <span className="text-xs font-poppins font-semibold text-foreground/70">
-            Нажми
-          </span>
-        </div>
+        {/* Hover overlay hint */}
+        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/3 transition-colors duration-200 opacity-0 group-hover:opacity-100 pointer-events-none" />
       </div>
     </div>
   );
