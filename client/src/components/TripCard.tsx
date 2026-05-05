@@ -170,7 +170,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
               <div className="flex h-8 rounded-lg overflow-hidden shadow-sm border border-border/20">
                 {beginnerPercent > 0 && (
                   <div
-                    className="bg-blue-500 flex items-center justify-center transition-all duration-300"
+                    className="bg-green-500 flex items-center justify-center transition-all duration-300"
                     style={{ width: `${beginnerPercent}%` }}
                   >
                     {beginnerPercent > 15 && (
@@ -197,12 +197,12 @@ export function TripCard({ title, date, participants, participantsList = [], onO
               {/* Program labels */}
               <div className="flex justify-between text-xs">
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  <span className="text-muted-foreground">С нуля</span>
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-muted-foreground">С нуля ({beginnerCount})</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-purple-500" />
-                  <span className="text-muted-foreground">Другие</span>
+                  <span className="text-muted-foreground">Другие ({otherProgramCount})</span>
                 </div>
               </div>
             </div>
