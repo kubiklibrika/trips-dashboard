@@ -79,15 +79,15 @@ export function ParticipantsModal({
   const getPaymentBadge = (status: string) => {
     if (status === 'paid') {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-50 rounded-full">
-          <CheckCircle2 className="w-4 h-4 text-green-600" />
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-50 rounded-full whitespace-nowrap">
+          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-700">Оплачено</span>
         </div>
       );
     } else if (status === 'unpaid') {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-50 rounded-full">
-          <AlertCircle className="w-4 h-4 text-red-600" />
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-50 rounded-full whitespace-nowrap">
+          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
           <span className="text-xs font-medium text-red-700">Не оплачено</span>
         </div>
       );
@@ -102,13 +102,13 @@ export function ParticipantsModal({
     
     if (isBeginner) {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 rounded-full">
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 rounded-full whitespace-nowrap">
           <span className="text-xs font-medium text-blue-700">С нуля</span>
         </div>
       );
     } else {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 rounded-full">
+        <div className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 rounded-full whitespace-nowrap">
           <span className="text-xs font-medium text-purple-700">{program}</span>
         </div>
       );
@@ -262,7 +262,7 @@ export function ParticipantsModal({
                     return (
                       <li
                         key={index}
-                        className="flex items-center justify-between gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors duration-150"
+                        className="flex items-center justify-between gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
@@ -270,16 +270,11 @@ export function ParticipantsModal({
                               {originalIndex + 1}
                             </span>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="font-inter text-foreground truncate block">
-                              {participant.name}
-                            </span>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              {participant.program}
-                            </div>
-                          </div>
+                          <span className="font-inter text-foreground font-medium truncate">
+                            {participant.name}
+                          </span>
                         </div>
-                        <div className="flex-shrink-0 flex gap-2">
+                        <div className="flex-shrink-0 flex gap-2 items-center">
                           {getProgramBadge(participant.program)}
                           {getPaymentBadge(participant.paymentStatus)}
                         </div>
