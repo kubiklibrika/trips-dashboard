@@ -101,6 +101,7 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
   const monthsWithTrips = useMemo(() => {
     const months: { [key: number]: Set<number> } = {};
     const tripsByMonth: { [key: number]: Trip[] } = {};
+    const dayToTripsMap: { [key: string]: Trip[] } = {}; // Map day to trips on that day
 
     trips.forEach(trip => {
       const parsed = parseTripDates(trip.date);
@@ -113,13 +114,18 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
         // Add all days in the range
         for (let day = parsed.startDay; day <= parsed.endDay; day++) {
           months[parsed.month].add(day);
+          const dayKey = `${parsed.month}-${day}`;
+          if (!dayToTripsMap[dayKey]) {
+            dayToTripsMap[dayKey] = [];
+          }
+          dayToTripsMap[dayKey].push(trip);
         }
 
         tripsByMonth[parsed.month].push(trip);
       }
     });
 
-    return { months, tripsByMonth };
+    return { months, tripsByMonth, dayToTripsMap };
   }, [trips]);
 
   const sortedMonths = Object.keys(monthsWithTrips.months)
@@ -142,11 +148,6 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
           const firstDay = getFirstDayOfMonth(month);
           const highlightedDays = monthsWithTrips.months[month];
           const monthTrips = monthsWithTrips.tripsByMonth[month];
-
-          // Get color from first trip in month (considering if it has passed)
-          const monthColor = monthTrips.length > 0 
-            ? getColorForTrip(monthTrips[0].title, isTripsDatePassed ? isTripsDatePassed(monthTrips[0].date) : false)
-            : 'bg-slate-300';
 
           return (
             <div
@@ -182,13 +183,27 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1;
                   const isHighlighted = highlightedDays.has(day);
+                  
+                  // Get the color for this specific day
+                  let dayColor = 'bg-white/10';
+                  if (isHighlighted) {
+                    const dayKey = `${month}-${day}`;
+                    const tripsOnDay = monthsWithTrips.dayToTripsMap[dayKey] || [];
+                    
+                    // Find the first trip on this day and get its color
+                    if (tripsOnDay.length > 0) {
+                      const trip = tripsOnDay[0];
+                      const isPassed = isTripsDatePassed ? isTripsDatePassed(trip.date) : false;
+                      dayColor = getColorForTrip(trip.title, isPassed);
+                    }
+                  }
 
                   return (
                     <div
                       key={day}
                       className={`aspect-square flex items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200
                         ${isHighlighted
-                          ? `${monthColor} text-white shadow-md`
+                          ? `${dayColor} text-white shadow-md`
                           : 'bg-white/10 text-foreground/60 hover:bg-white/20'
                         }`}
                     >
