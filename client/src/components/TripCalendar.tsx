@@ -67,23 +67,14 @@ function parseTripDates(dateStr: string): { startDay: number; endDay: number; mo
   return null;
 }
 
-// Get color based on trip location and if it has passed
-function getColorForTrip(title: string, isPassed: boolean): string {
+// Get color based on if trip has passed
+function getColorForTrip(isPassed: boolean): string {
   // If trip has passed, use gray
   if (isPassed) {
     return 'bg-gray-400';
   }
 
-  const lowerTitle = title.toLowerCase();
-
-  if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
-    return 'bg-cyan-400';
-  } else if (lowerTitle.includes('дагестан')) {
-    return 'bg-amber-400';
-  } else if (lowerTitle.includes('чегем')) {
-    return 'bg-slate-400';
-  }
-
+  // All future trips use blue color
   return 'bg-blue-400';
 }
 
@@ -194,7 +185,7 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
                     if (tripsOnDay.length > 0) {
                       const trip = tripsOnDay[0];
                       const isPassed = isTripsDatePassed ? isTripsDatePassed(trip.date) : false;
-                      dayColor = getColorForTrip(trip.title, isPassed);
+                      dayColor = getColorForTrip(isPassed);
                     }
                   }
 
