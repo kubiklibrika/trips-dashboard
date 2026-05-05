@@ -21,7 +21,6 @@ import { CheckCircle2, AlertCircle } from 'lucide-react';
 interface Participant {
   name: string;
   paymentStatus: string;
-  program: string;
 }
 
 interface TripCardProps {
@@ -58,13 +57,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
     p => p.paymentStatus === 'unpaid'
   ).length;
 
-  // Calculate program stats
-  const beginnerCount = participantsList.filter(
-    p => p.program && p.program.toLowerCase().includes('с нуля')
-  ).length;
-  const otherProgramCount = participantsList.filter(
-    p => p.program && !p.program.toLowerCase().includes('с нуля')
-  ).length;
+
 
   return (
     <div className="group relative">
@@ -132,32 +125,6 @@ export function TripCard({ title, date, participants, participantsList = [], onO
               </div>
             </div>
 
-            {/* Program Stats */}
-            <div className="grid grid-cols-2 gap-2">
-              {/* Beginners */}
-              <div className="bg-blue-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <p className="text-xs text-blue-700 font-inter font-semibold">
-                    С нуля
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-blue-600">
-                  {beginnerCount}
-                </p>
-              </div>
-
-              {/* Other programs */}
-              <div className="bg-purple-50/80 backdrop-blur-sm rounded-lg p-2.5">
-                <div className="flex items-center gap-1 mb-1">
-                  <p className="text-xs text-purple-700 font-inter font-semibold">
-                    Другие
-                  </p>
-                </div>
-                <p className="font-poppins font-bold text-base text-purple-600">
-                  {otherProgramCount}
-                </p>
-              </div>
-            </div>
           </>
         )}
 

@@ -198,7 +198,6 @@ export async function upsertParticipant(participant: InsertParticipant): Promise
     await db.insert(participants).values(participant).onDuplicateKeyUpdate({
       set: {
         paymentStatus: participant.paymentStatus,
-        program: participant.program,
       },
     });
     return participant as Participant;

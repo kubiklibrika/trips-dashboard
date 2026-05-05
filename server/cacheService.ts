@@ -49,7 +49,6 @@ export async function refreshCache() {
               tripId: savedTrip.id,
               name: participant.name,
               paymentStatus: participant.paymentStatus,
-              program: participant.program,
             });
           }
         }
