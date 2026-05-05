@@ -1,17 +1,9 @@
-/**
- * TripCard Component - Variant 3 Infographic Design
- * 
- * Design Philosophy: Clean infographic with visual hierarchy
- * - Large central number for participants
- * - Location icon on the left
- * - Dot grid visualization for payment status
- * - Horizontal percentage bar for program distribution
- */
+import { MapPin, Waves, Mountain, Trees } from 'lucide-react';
 
 interface Participant {
   name: string;
   paymentStatus: string;
-  program: string;
+  program?: string;
 }
 
 interface TripCardProps {
@@ -19,21 +11,11 @@ interface TripCardProps {
   date: string;
   participants: number;
   participantsList?: Participant[];
-  onOpenModal?: () => void;
+  onOpenModal: () => void;
   isPassed?: boolean;
 }
 
 export function TripCard({ title, date, participants, participantsList = [], onOpenModal, isPassed = false }: TripCardProps) {
-  // Determine background based on if trip has passed
-  const getBackgroundImage = (isPassed: boolean) => {
-    if (isPassed) {
-      return 'https://d2xsxph8kpxj0f.cloudfront.net/310519663200453583/Y478AcgKFLZ2Ut57UzHwjN/trip-card-bg-gray-fMMxJ2wnSQ5fiuwR8WZ5vG.webp';
-    }
-    return 'https://d2xsxph8kpxj0f.cloudfront.net/310519663200453583/Y478AcgKFLZ2Ut57UzHwjN/trip-card-bg-blue-PTUpdqUrhmndwmZXcJ8zsZ.webp';
-  };
-
-  const backgroundImage = getBackgroundImage(isPassed);
-
   // Calculate payment stats
   const paidCount = participantsList.filter(
     p => p.paymentStatus === 'paid'
@@ -43,175 +25,152 @@ export function TripCard({ title, date, participants, participantsList = [], onO
   ).length;
 
   // Calculate program stats
-  const beginnerCount = participantsList.filter(
-    p => p.program && p.program.toLowerCase().includes('с нуля')
+  const fromZeroCount = participantsList.filter(
+    p => p.program?.toLowerCase() === 'с нуля'
   ).length;
   const otherProgramCount = participantsList.filter(
-    p => p.program && !p.program.toLowerCase().includes('с нуля')
+    p => p.program?.toLowerCase() !== 'с нуля'
   ).length;
 
-  // Get location icon emoji based on title
-  const getLocationIcon = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes('турция') || lowerTitle.includes('анталья') || lowerTitle.includes('олюдениз')) {
-      return '🏖️';
-    } else if (lowerTitle.includes('дагестан')) {
-      return '⛰️';
-    } else if (lowerTitle.includes('чегем')) {
-      return '🏔️';
+  // Get location icon based on title
+  const getLocationIcon = () => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('турция') || titleLower.includes('олюдениз') || titleLower.includes('анталья')) {
+      return <Waves className="w-8 h-8 text-primary" />;
     }
-    return '🗺️';
+    if (titleLower.includes('чегем')) {
+      return <Mountain className="w-8 h-8 text-primary" />;
+    }
+    if (titleLower.includes('дагестан')) {
+      return <Trees className="w-8 h-8 text-primary" />;
+    }
+    return <MapPin className="w-8 h-8 text-primary" />;
   };
 
-  const locationIcon = getLocationIcon(title);
-
-
-
-  // Calculate program percentages
-  const beginnerPercent = participants > 0 ? Math.round((beginnerCount / participants) * 100) : 0;
-  const otherPercent = 100 - beginnerPercent;
+  // Get background color based on passed status
+  const getBackgroundClass = () => {
+    return isPassed ? 'bg-gray-100' : 'bg-blue-50';
+  };
 
   return (
-    <div className="group relative h-full">
-      {/* Card container */}
-      <div
-        className={`relative rounded-xl p-5 h-full
-                   shadow-sm hover:shadow-md
-                   border border-border/30
-                   transition-all duration-200 ease-out
-                   cursor-pointer
-                   backdrop-blur-sm
-                   flex flex-col
-                   bg-cover bg-center`}
-        style={{
-          backgroundImage: `url('${backgroundImage}')`
-        }}
-        onClick={onOpenModal}
-      >
-        {/* Background overlay for better text readability */}
-        <div className="absolute inset-0 rounded-xl bg-white/40 pointer-events-none" />
-        {/* Header with title and date */}
-        <div className="relative flex-1 min-w-0 mb-4 z-10">
+    <div
+      className={`relative rounded-xl p-6 h-full
+                 shadow-sm hover:shadow-md
+                 border border-border/30
+                 transition-all duration-200 ease-out
+                 cursor-pointer
+                 flex flex-col
+                 ${getBackgroundClass()}`}
+      onClick={onOpenModal}
+    >
+      {/* Header with location icon and title */}
+      <div className="flex items-start gap-3 mb-6">
+        <div className="flex-shrink-0 pt-1">
+          {getLocationIcon()}
+        </div>
+        <div className="flex-1 min-w-0">
           <h3 className="font-poppins font-bold text-base text-foreground line-clamp-2 leading-tight">
             {title}
           </h3>
-          <p className="text-xs text-muted-foreground font-inter mt-1.5 flex items-center gap-1">
+          <p className="text-xs text-muted-foreground font-inter mt-1.5">
             📅 {date}
           </p>
         </div>
-
-        {/* Central participants number - Large and prominent */}
-        <div className="relative flex-1 flex flex-col items-center justify-center my-4 z-10">
-          <p className="font-poppins font-black text-6xl text-primary leading-none">
-            {participants}
-          </p>
-          <p className="text-sm text-muted-foreground font-inter mt-2 uppercase tracking-wider">
-            участников
-          </p>
-        </div>
-
-        {/* Payment status bar */}
-        {participantsList.length > 0 && (
-          <>
-            {/* Payment bar section */}
-            <div className="relative mb-4 space-y-2 z-10">
-              <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
-                Статус оплаты
-              </p>
-              
-              {/* Horizontal payment bar */}
-              <div className="flex h-8 rounded-lg overflow-hidden shadow-sm border border-border/20">
-                {paidCount > 0 && (
-                  <div
-                    className="bg-green-500 flex items-center justify-center transition-all duration-300"
-                    style={{ width: `${(paidCount / participants) * 100}%` }}
-                  >
-                    {(paidCount / participants) * 100 > 15 && (
-                      <span className="text-white text-xs font-bold">
-                        {paidCount}
-                      </span>
-                    )}
-                  </div>
-                )}
-                {unpaidCount > 0 && (
-                  <div
-                    className="bg-red-500 flex items-center justify-center transition-all duration-300"
-                    style={{ width: `${(unpaidCount / participants) * 100}%` }}
-                  >
-                    {(unpaidCount / participants) * 100 > 15 && (
-                      <span className="text-white text-xs font-bold">
-                        {unpaidCount}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Payment labels */}
-              <div className="flex justify-between text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-muted-foreground">Оплачено ({paidCount})</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  <span className="text-muted-foreground">Не оплачено ({unpaidCount})</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Program distribution bar section */}
-            <div className="relative space-y-2 z-10">
-              <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
-                Программа тура
-              </p>
-              
-              {/* Horizontal percentage bar */}
-              <div className="flex h-8 rounded-lg overflow-hidden shadow-sm border border-border/20">
-                {beginnerPercent > 0 && (
-                  <div
-                    className="bg-green-500 flex items-center justify-center transition-all duration-300"
-                    style={{ width: `${beginnerPercent}%` }}
-                  >
-                    {beginnerPercent > 15 && (
-                      <span className="text-white text-xs font-bold">
-                        {beginnerCount}
-                      </span>
-                    )}
-                  </div>
-                )}
-                {otherPercent > 0 && (
-                  <div
-                    className="bg-purple-500 flex items-center justify-center transition-all duration-300"
-                    style={{ width: `${otherPercent}%` }}
-                  >
-                    {otherPercent > 15 && (
-                      <span className="text-white text-xs font-bold">
-                        {otherProgramCount}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Program labels */}
-              <div className="flex justify-between text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-muted-foreground">С нуля ({beginnerCount})</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-purple-500" />
-                  <span className="text-muted-foreground">Другие ({otherProgramCount})</span>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Hover overlay hint */}
-        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/3 transition-colors duration-200 opacity-0 group-hover:opacity-100 pointer-events-none z-20" />
       </div>
+
+      {/* Central participants number - Large and prominent */}
+      <div className="flex-1 flex flex-col items-center justify-center my-4">
+        <p className="font-poppins font-black text-6xl text-primary leading-none">
+          {participants}
+        </p>
+        <p className="text-sm text-muted-foreground font-inter mt-2 uppercase tracking-wider">
+          участников
+        </p>
+      </div>
+
+      {/* Payment status dots grid */}
+      {participantsList.length > 0 && (
+        <div className="mb-4 space-y-2">
+          <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
+            Статус оплаты
+          </p>
+          
+          {/* Dots grid for payment status */}
+          <div className="flex flex-wrap gap-1.5 justify-center">
+            {/* Paid dots (green) */}
+            {Array.from({ length: paidCount }).map((_, i) => (
+              <div
+                key={`paid-${i}`}
+                className="w-2.5 h-2.5 rounded-full bg-green-500"
+                title={`Оплачено (${i + 1})`}
+              />
+            ))}
+            {/* Unpaid dots (red) */}
+            {Array.from({ length: unpaidCount }).map((_, i) => (
+              <div
+                key={`unpaid-${i}`}
+                className="w-2.5 h-2.5 rounded-full bg-red-500"
+                title={`Не оплачено (${i + 1})`}
+              />
+            ))}
+          </div>
+
+          {/* Payment legend */}
+          <div className="flex justify-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              Оплачено ({paidCount})
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              Не оплачено ({unpaidCount})
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Program distribution bar */}
+      {participantsList.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
+            Программа тура
+          </p>
+          
+          {/* Program bar */}
+          <div className="flex h-8 rounded-lg overflow-hidden border border-border/30 shadow-sm">
+            {/* From zero (green) */}
+            {fromZeroCount > 0 && (
+              <div
+                className="bg-green-500 flex items-center justify-center text-white text-xs font-bold transition-all duration-200"
+                style={{ width: `${(fromZeroCount / participants) * 100}%` }}
+              >
+                {fromZeroCount > 0 && fromZeroCount}
+              </div>
+            )}
+            {/* Other programs (purple) */}
+            {otherProgramCount > 0 && (
+              <div
+                className="bg-purple-500 flex items-center justify-center text-white text-xs font-bold transition-all duration-200"
+                style={{ width: `${(otherProgramCount / participants) * 100}%` }}
+              >
+                {otherProgramCount > 0 && otherProgramCount}
+              </div>
+            )}
+          </div>
+
+          {/* Program legend */}
+          <div className="flex justify-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded bg-green-500" />
+              С нуля ({fromZeroCount})
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded bg-purple-500" />
+              Другие ({otherProgramCount})
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
