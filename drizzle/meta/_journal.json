@@ -22,6 +22,13 @@
       "when": 1774893880548,
       "tag": "0002_bent_argent",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1777983079371,
+      "tag": "0003_open_deadpool",
+      "breakpoints": true
     }
   ]
 }

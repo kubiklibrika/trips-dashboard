@@ -1,0 +1,1 @@
+ALTER TABLE `participants` ADD `program` varchar(100) DEFAULT 'unknown' NOT NULL;

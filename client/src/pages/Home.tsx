@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 interface Participant {
   name: string;
   paymentStatus: string;
+  program: string;
 }
 
 interface Trip {
