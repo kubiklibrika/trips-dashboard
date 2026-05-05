@@ -25,14 +25,14 @@ interface TripCardProps {
 
 export function TripCard({ title, date, participants, participantsList = [], onOpenModal, isPassed = false }: TripCardProps) {
   // Determine background based on if trip has passed
-  const getBackgroundStyle = (isPassed: boolean) => {
+  const getBackgroundImage = (isPassed: boolean) => {
     if (isPassed) {
-      return 'bg-gradient-to-br from-gray-200 to-gray-100 border-gray-300';
+      return 'https://d2xsxph8kpxj0f.cloudfront.net/310519663200453583/Y478AcgKFLZ2Ut57UzHwjN/trip-card-bg-gray-fMMxJ2wnSQ5fiuwR8WZ5vG.webp';
     }
-    return 'bg-gradient-to-br from-blue-100 to-cyan-50 border-blue-300';
+    return 'https://d2xsxph8kpxj0f.cloudfront.net/310519663200453583/Y478AcgKFLZ2Ut57UzHwjN/trip-card-bg-blue-PTUpdqUrhmndwmZXcJ8zsZ.webp';
   };
 
-  const backgroundStyle = getBackgroundStyle(isPassed);
+  const backgroundImage = getBackgroundImage(isPassed);
 
   // Calculate payment stats
   const paidCount = participantsList.filter(
@@ -77,16 +77,21 @@ export function TripCard({ title, date, participants, participantsList = [], onO
       <div
         className={`relative rounded-xl p-5 h-full
                    shadow-sm hover:shadow-md
-                   border
+                   border border-border/30
                    transition-all duration-200 ease-out
                    cursor-pointer
                    backdrop-blur-sm
                    flex flex-col
-                   ${backgroundStyle}`}
+                   bg-cover bg-center`}
+        style={{
+          backgroundImage: `url('${backgroundImage}')`
+        }}
         onClick={onOpenModal}
       >
+        {/* Background overlay for better text readability */}
+        <div className="absolute inset-0 rounded-xl bg-white/40 pointer-events-none" />
         {/* Header with title and date */}
-        <div className="flex-1 min-w-0 mb-4">
+        <div className="relative flex-1 min-w-0 mb-4 z-10">
           <h3 className="font-poppins font-bold text-base text-foreground line-clamp-2 leading-tight">
             {title}
           </h3>
@@ -96,7 +101,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         </div>
 
         {/* Central participants number - Large and prominent */}
-        <div className="flex-1 flex flex-col items-center justify-center my-4">
+        <div className="relative flex-1 flex flex-col items-center justify-center my-4 z-10">
           <p className="font-poppins font-black text-6xl text-primary leading-none">
             {participants}
           </p>
@@ -109,7 +114,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         {participantsList.length > 0 && (
           <>
             {/* Payment bar section */}
-            <div className="mb-4 space-y-2">
+            <div className="relative mb-4 space-y-2 z-10">
               <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
                 Статус оплаты
               </p>
@@ -156,7 +161,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
             </div>
 
             {/* Program distribution bar section */}
-            <div className="space-y-2">
+            <div className="relative space-y-2 z-10">
               <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider text-center">
                 Программа тура
               </p>
@@ -205,7 +210,7 @@ export function TripCard({ title, date, participants, participantsList = [], onO
         )}
 
         {/* Hover overlay hint */}
-        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/3 transition-colors duration-200 opacity-0 group-hover:opacity-100 pointer-events-none" />
+        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/3 transition-colors duration-200 opacity-0 group-hover:opacity-100 pointer-events-none z-20" />
       </div>
     </div>
   );
