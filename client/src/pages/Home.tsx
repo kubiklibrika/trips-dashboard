@@ -296,7 +296,7 @@ export default function Home() {
               </div>
 
               {/* Trip Calendar */}
-              <TripCalendar trips={trips} isTripsDatePassed={isTripsDatePassed} />
+              <TripCalendar trips={trips} isTripsDatePassed={isTripsDatePassed} onDayClick={handleOpenModal} />
             </div>
           ) : (
             <div className="text-center py-12">

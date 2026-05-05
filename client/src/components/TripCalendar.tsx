@@ -22,6 +22,7 @@ interface Trip {
 interface TripCalendarProps {
   trips: Trip[];
   isTripsDatePassed?: (dateStr: string) => boolean;
+  onDayClick?: (trip: Trip) => void;
 }
 
 const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -88,7 +89,7 @@ function getFirstDayOfMonth(month: number, year: number = 2026): number {
   return new Date(year, month - 1, 1).getDay();
 }
 
-export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
+export function TripCalendar({ trips, isTripsDatePassed, onDayClick }: TripCalendarProps) {
   const monthsWithTrips = useMemo(() => {
     const months: { [key: number]: Set<number> } = {};
     const tripsByMonth: { [key: number]: Trip[] } = {};
@@ -192,9 +193,18 @@ export function TripCalendar({ trips, isTripsDatePassed }: TripCalendarProps) {
                   return (
                     <div
                       key={day}
+                      onClick={() => {
+                        if (isHighlighted && onDayClick) {
+                          const dayKey = `${month}-${day}`;
+                          const tripsOnDay = monthsWithTrips.dayToTripsMap[dayKey] || [];
+                          if (tripsOnDay.length > 0) {
+                            onDayClick(tripsOnDay[0]);
+                          }
+                        }
+                      }}
                       className={`aspect-square flex items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200
                         ${isHighlighted
-                          ? `${dayColor} text-white shadow-md`
+                          ? `${dayColor} text-white shadow-md cursor-pointer hover:shadow-lg`
                           : 'bg-white/10 text-foreground/60 hover:bg-white/20'
                         }`}
                     >
