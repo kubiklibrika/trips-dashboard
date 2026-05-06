@@ -46,6 +46,9 @@ export const participants = mysqlTable("participants", {
   name: varchar("name", { length: 255 }).notNull(),
   paymentStatus: varchar("paymentStatus", { length: 50 }).notNull(),
   program: varchar("program", { length: 100 }).default("unknown").notNull(),
+  harness: varchar("harness", { length: 255 }),
+  wing: varchar("wing", { length: 255 }),
+  helmet: varchar("helmet", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

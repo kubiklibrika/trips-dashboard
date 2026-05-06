@@ -7,15 +7,19 @@
  * - Filter buttons for payment status
  * - Smooth entrance/exit animations
  * - Clean, readable list format
+ * - Equipment display (harness, wing, helmet) under each participant
  */
 
 import { useState, useMemo } from 'react';
-import { X, Users, Search, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Users, Search, CheckCircle2, AlertCircle, Zap, Wind, Shield } from 'lucide-react';
 
 interface Participant {
   name: string;
   paymentStatus: string;
   program: string;
+  harness?: string | null;
+  wing?: string | null;
+  helmet?: string | null;
 }
 
 interface ParticipantsModalProps {
@@ -113,6 +117,39 @@ export function ParticipantsModal({
         </div>
       );
     }
+  };
+
+  const getEquipmentDisplay = (participant: Participant) => {
+    const equipment = [];
+    
+    if (participant.harness) {
+      equipment.push(
+        <div key="harness" className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 rounded-full whitespace-nowrap">
+          <Zap className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+          <span className="text-xs font-medium text-amber-700">{participant.harness}</span>
+        </div>
+      );
+    }
+    
+    if (participant.wing) {
+      equipment.push(
+        <div key="wing" className="flex items-center gap-1.5 px-2.5 py-1 bg-cyan-50 rounded-full whitespace-nowrap">
+          <Wind className="w-3.5 h-3.5 text-cyan-600 flex-shrink-0" />
+          <span className="text-xs font-medium text-cyan-700">{participant.wing}</span>
+        </div>
+      );
+    }
+    
+    if (participant.helmet) {
+      equipment.push(
+        <div key="helmet" className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-full whitespace-nowrap">
+          <Shield className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
+          <span className="text-xs font-medium text-slate-700">{participant.helmet}</span>
+        </div>
+      );
+    }
+    
+    return equipment.length > 0 ? equipment : null;
   };
 
   return (
@@ -255,29 +292,37 @@ export function ParticipantsModal({
                   Найдено участников: <span className="font-poppins font-semibold text-primary">{filteredParticipants.length}</span>
                   {(searchQuery || paymentFilter !== 'all') && <span className="text-xs ml-2">из {participants.length}</span>}
                 </p>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {filteredParticipants.map((participant, index) => {
                     // Find original index for numbering
                     const originalIndex = participants.indexOf(participant);
+                    const equipmentDisplay = getEquipmentDisplay(participant);
                     return (
                       <li
                         key={index}
-                        className="flex items-center justify-between gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
+                        className="flex flex-col gap-2.5 p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
                       >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-poppins font-semibold text-primary">
-                              {originalIndex + 1}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                              <span className="text-xs font-poppins font-semibold text-primary">
+                                {originalIndex + 1}
+                              </span>
+                            </div>
+                            <span className="font-inter text-foreground font-medium truncate">
+                              {participant.name}
                             </span>
                           </div>
-                          <span className="font-inter text-foreground font-medium truncate">
-                            {participant.name}
-                          </span>
+                          <div className="flex-shrink-0 flex gap-2 items-center">
+                            {getProgramBadge(participant.program)}
+                            {getPaymentBadge(participant.paymentStatus)}
+                          </div>
                         </div>
-                        <div className="flex-shrink-0 flex gap-2 items-center">
-                          {getProgramBadge(participant.program)}
-                          {getPaymentBadge(participant.paymentStatus)}
-                        </div>
+                        {equipmentDisplay && (
+                          <div className="flex flex-wrap gap-2 pl-11">
+                            {equipmentDisplay}
+                          </div>
+                        )}
                       </li>
                     );
                   })}

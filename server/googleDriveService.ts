@@ -5,6 +5,9 @@ interface Participant {
   name: string;
   paymentStatus: string;
   program: string;
+  harness?: string;
+  wing?: string;
+  helmet?: string;
 }
 
 interface Trip {
@@ -160,12 +163,20 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       program = programValue;
     }
 
-    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}"`);
+    // Get equipment from columns M, N, O
+    const harness = (row["Подвеска"] || "").toString().trim() || undefined;
+    const wing = (row["Крыло"] || "").toString().trim() || undefined;
+    const helmet = (row["Шлем"] || "").toString().trim() || undefined;
+
+    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}" | Equipment: ${harness}, ${wing}, ${helmet}`);
 
     participants.push({
       name,
       paymentStatus,
       program,
+      harness,
+      wing,
+      helmet,
     });
   }
 

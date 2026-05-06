@@ -28,6 +28,9 @@ interface Participant {
   name: string;
   paymentStatus: string;
   program: string;
+  harness?: string | null;
+  wing?: string | null;
+  helmet?: string | null;
 }
 
 interface Trip {
