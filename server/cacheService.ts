@@ -50,6 +50,9 @@ export async function refreshCache() {
               name: participant.name,
               paymentStatus: participant.paymentStatus,
               program: participant.program,
+              harness: participant.harness,
+              wing: participant.wing,
+              helmet: participant.helmet,
             });
           }
         }

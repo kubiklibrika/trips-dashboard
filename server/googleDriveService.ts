@@ -108,13 +108,18 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
     return [];
   }
 
-  const rows = XLSX.utils.sheet_to_json<any>(sheet);
+  // Parse all rows with all columns
+  const rows = XLSX.utils.sheet_to_json<any>(sheet, { blankrows: false } as any);
   const participants: Participant[] = [];
 
   console.log(`[parseExcelFile] Total rows: ${rows.length}`);
   if (rows.length > 0) {
     console.log(`[parseExcelFile] First row keys:`, Object.keys(rows[0]));
-    console.log(`[parseExcelFile] First row values:`, Object.values(rows[0]));
+    console.log(`[parseExcelFile] First row:`, JSON.stringify(rows[0], null, 2));
+    console.log(`[parseExcelFile] All available keys in first 3 rows:`);
+    for (let i = 0; i < Math.min(3, rows.length); i++) {
+      console.log(`  Row ${i}:`, Object.keys(rows[i]));
+    }
   }
 
   for (const row of rows) {
@@ -163,10 +168,35 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       program = programValue;
     }
 
-    // Get equipment from columns M, N, O
-    const harness = (row["Подвеска"] || "").toString().trim() || undefined;
-    const wing = (row["Крыло"] || "").toString().trim() || undefined;
-    const helmet = (row["Шлем"] || "").toString().trim() || undefined;
+    // Get equipment from merged column or separate columns
+    let harness: string | undefined = undefined;
+    let wing: string | undefined = undefined;
+    let helmet: string | undefined = undefined;
+    
+    // Try to get from merged column first (e.g. "Снаряжение  Подвеска/     Крыло")
+    const equipmentMerged = row["Снаряжение  Подвеска/     Крыло"] || row["Подвеска"];
+    if (equipmentMerged) {
+      const equipStr = equipmentMerged.toString().trim();
+      if (equipStr && equipStr !== "-") {
+        harness = equipStr;
+      }
+    }
+    
+    // Try to get wing from separate column
+    if (row["Крыло"]) {
+      const wingStr = (row["Крыло"] || "").toString().trim();
+      if (wingStr && wingStr !== "-") {
+        wing = wingStr;
+      }
+    }
+    
+    // Try to get helmet from separate column
+    if (row["Шлем"]) {
+      const helmetStr = (row["Шлем"] || "").toString().trim();
+      if (helmetStr && helmetStr !== "-") {
+        helmet = helmetStr;
+      }
+    }
 
     console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}" | Equipment: ${harness}, ${wing}, ${helmet}`);
 

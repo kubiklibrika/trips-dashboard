@@ -199,6 +199,9 @@ export async function upsertParticipant(participant: InsertParticipant): Promise
       set: {
         paymentStatus: participant.paymentStatus,
         program: participant.program,
+        harness: participant.harness,
+        wing: participant.wing,
+        helmet: participant.helmet,
       },
     });
     return participant as Participant;
