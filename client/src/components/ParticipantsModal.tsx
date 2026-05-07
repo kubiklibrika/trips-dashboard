@@ -8,6 +8,7 @@
  * - Smooth entrance/exit animations
  * - Clean, readable list format
  * - Equipment display (harness, wing, helmet) under each participant
+ * - Fully responsive mobile-first design
  */
 
 import { useState, useMemo } from 'react';
@@ -83,16 +84,16 @@ export function ParticipantsModal({
   const getPaymentBadge = (status: string) => {
     if (status === 'paid') {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-50 rounded-full whitespace-nowrap">
-          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
-          <span className="text-xs font-medium text-green-700">Оплачено</span>
+        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-green-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" />
+          <span className="font-medium text-green-700">Оплачено</span>
         </div>
       );
     } else if (status === 'unpaid') {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-50 rounded-full whitespace-nowrap">
-          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-          <span className="text-xs font-medium text-red-700">Не оплачено</span>
+        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-red-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 flex-shrink-0" />
+          <span className="font-medium text-red-700">Не оплачено</span>
         </div>
       );
     }
@@ -106,14 +107,14 @@ export function ParticipantsModal({
     
     if (isBeginner) {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 rounded-full whitespace-nowrap">
-          <span className="text-xs font-medium text-blue-700">С нуля</span>
+        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-blue-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <span className="font-medium text-blue-700">С нуля</span>
         </div>
       );
     } else {
       return (
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 rounded-full whitespace-nowrap">
-          <span className="text-xs font-medium text-purple-700">{program}</span>
+        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-purple-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <span className="font-medium text-purple-700 truncate">{program}</span>
         </div>
       );
     }
@@ -124,27 +125,27 @@ export function ParticipantsModal({
     
     if (participant.harness) {
       equipment.push(
-        <div key="harness" className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 rounded-full whitespace-nowrap">
-          <Zap className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-          <span className="text-xs font-medium text-amber-700">{participant.harness}</span>
+        <div key="harness" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-amber-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600 flex-shrink-0" />
+          <span className="font-medium text-amber-700 truncate">{participant.harness}</span>
         </div>
       );
     }
     
     if (participant.wing) {
       equipment.push(
-        <div key="wing" className="flex items-center gap-1.5 px-2.5 py-1 bg-cyan-50 rounded-full whitespace-nowrap">
-          <Wind className="w-3.5 h-3.5 text-cyan-600 flex-shrink-0" />
-          <span className="text-xs font-medium text-cyan-700">{participant.wing}</span>
+        <div key="wing" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-cyan-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <Wind className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-600 flex-shrink-0" />
+          <span className="font-medium text-cyan-700 truncate">{participant.wing}</span>
         </div>
       );
     }
     
     if (participant.helmet) {
       equipment.push(
-        <div key="helmet" className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 rounded-full whitespace-nowrap">
-          <Shield className="w-3.5 h-3.5 text-slate-600 flex-shrink-0" />
-          <span className="text-xs font-medium text-slate-700">{participant.helmet}</span>
+        <div key="helmet" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-slate-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
+          <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-600 flex-shrink-0" />
+          <span className="font-medium text-slate-700 truncate">{participant.helmet}</span>
         </div>
       );
     }
@@ -160,98 +161,98 @@ export function ParticipantsModal({
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      {/* Modal - Fully responsive */}
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div
-          className="bg-card text-card-foreground rounded-[16px] shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                     max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col
+          className="bg-card text-card-foreground rounded-t-2xl sm:rounded-[16px] shadow-[0_20px_60px_rgba(0,0,0,0.15)]
+                     w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col
                      border border-border/50"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border/30">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Users className="w-5 h-5 text-primary" />
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border/30">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+              <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
-              <div>
-                <h2 className="font-poppins font-semibold text-xl text-foreground">
+              <div className="min-w-0">
+                <h2 className="font-poppins font-semibold text-base sm:text-xl text-foreground truncate">
                   {tripTitle}
                 </h2>
-                <p className="text-sm text-muted-foreground font-inter">
+                <p className="text-xs sm:text-sm text-muted-foreground font-inter">
                   {tripDate}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-secondary rounded-lg transition-colors duration-200"
+              className="p-1.5 sm:p-2 hover:bg-secondary rounded-lg transition-colors duration-200 flex-shrink-0 ml-2"
             >
-              <X className="w-5 h-5 text-muted-foreground" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
             </button>
           </div>
 
-          {/* Stats section */}
-          <div className="px-6 pt-4 pb-2 border-b border-border/30">
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="p-3 bg-secondary/30 rounded-lg">
+          {/* Stats section - Responsive grid */}
+          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-2 border-b border-border/30">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="p-2.5 sm:p-3 bg-secondary/30 rounded-lg">
                 <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-1">
                   Всего
                 </p>
-                <p className="font-poppins font-semibold text-lg text-foreground">
+                <p className="font-poppins font-semibold text-base sm:text-lg text-foreground">
                   {stats.total}
                 </p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
+              <div className="p-2.5 sm:p-3 bg-green-50 rounded-lg">
                 <p className="text-xs text-green-700 font-inter uppercase tracking-wider mb-1">
                   Оплачено
                 </p>
-                <p className="font-poppins font-semibold text-lg text-green-600">
+                <p className="font-poppins font-semibold text-base sm:text-lg text-green-600">
                   {stats.paid}
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-red-50 rounded-lg">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 bg-red-50 rounded-lg">
                 <p className="text-xs text-red-700 font-inter uppercase tracking-wider mb-1">
                   Не оплачено
                 </p>
-                <p className="font-poppins font-semibold text-lg text-red-600">
+                <p className="font-poppins font-semibold text-base sm:text-lg text-red-600">
                   {stats.unpaid}
                 </p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
+              <div className="p-2.5 sm:p-3 bg-blue-50 rounded-lg">
                 <p className="text-xs text-blue-700 font-inter uppercase tracking-wider mb-1">
                   С нуля
                 </p>
-                <p className="font-poppins font-semibold text-lg text-blue-600">
+                <p className="font-poppins font-semibold text-base sm:text-lg text-blue-600">
                   {programStats.beginners}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Search and filter section */}
-          <div className="px-6 pt-4 pb-4 border-b border-border/30 space-y-3">
+          {/* Search and filter section - Responsive */}
+          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-3 sm:pb-4 border-b border-border/30 space-y-2.5 sm:space-y-3">
             {/* Search field */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Поиск по имени или фамилии..."
+                placeholder="Поиск по имени..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-secondary/50 text-foreground placeholder-muted-foreground
+                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-secondary/50 text-foreground placeholder-muted-foreground text-sm sm:text-base
                            rounded-lg border border-border/50 focus:outline-none focus:ring-2 focus:ring-primary/50
                            font-inter transition-all duration-200"
               />
             </div>
 
-            {/* Filter buttons */}
-            <div className="flex gap-2">
+            {/* Filter buttons - Responsive */}
+            <div className="flex gap-1.5 sm:gap-2 flex-wrap">
               <button
                 onClick={() => setPaymentFilter('all')}
-                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 ${
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 ${
                   paymentFilter === 'all'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary/50 text-foreground hover:bg-secondary'
@@ -261,38 +262,40 @@ export function ParticipantsModal({
               </button>
               <button
                 onClick={() => setPaymentFilter('paid')}
-                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
                   paymentFilter === 'paid'
                     ? 'bg-green-600 text-white'
                     : 'bg-green-50 text-green-700 hover:bg-green-100'
                 }`}
               >
-                <CheckCircle2 className="w-4 h-4" />
-                Оплачено
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Оплачено</span>
+                <span className="sm:hidden">Опл.</span>
               </button>
               <button
                 onClick={() => setPaymentFilter('unpaid')}
-                className={`px-3 py-2 rounded-lg font-inter text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
                   paymentFilter === 'unpaid'
                     ? 'bg-red-600 text-white'
                     : 'bg-red-50 text-red-700 hover:bg-red-100'
                 }`}
               >
-                <AlertCircle className="w-4 h-4" />
-                Не оплачено
+                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Не оплачено</span>
+                <span className="sm:hidden">Не опл.</span>
               </button>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          {/* Content - Responsive list */}
+          <div className="flex-1 overflow-y-auto p-3 sm:p-6">
             {filteredParticipants.length > 0 ? (
               <div>
-                <p className="text-sm text-muted-foreground font-inter uppercase tracking-wider mb-4">
-                  Найдено участников: <span className="font-poppins font-semibold text-primary">{filteredParticipants.length}</span>
+                <p className="text-xs sm:text-sm text-muted-foreground font-inter uppercase tracking-wider mb-3 sm:mb-4">
+                  Найдено: <span className="font-poppins font-semibold text-primary">{filteredParticipants.length}</span>
                   {(searchQuery || paymentFilter !== 'all') && <span className="text-xs ml-2">из {participants.length}</span>}
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {filteredParticipants.map((participant, index) => {
                     // Find original index for numbering
                     const originalIndex = participants.indexOf(participant);
@@ -300,26 +303,31 @@ export function ParticipantsModal({
                     return (
                       <li
                         key={index}
-                        className="flex flex-col gap-2.5 p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
+                        className="flex flex-col gap-2 p-3 sm:p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
                       >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                              <span className="text-xs font-poppins font-semibold text-primary">
+                        {/* Name and badges row */}
+                        <div className="flex items-start justify-between gap-2 sm:gap-4">
+                          <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                            <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mt-0.5">
+                              <span className="text-xs sm:text-xs font-poppins font-semibold text-primary">
                                 {originalIndex + 1}
                               </span>
                             </div>
-                            <span className="font-inter text-foreground font-medium truncate">
+                            <span className="font-inter text-sm sm:text-base text-foreground font-medium truncate">
                               {participant.name}
                             </span>
                           </div>
-                          <div className="flex-shrink-0 flex gap-2 items-center">
-                            {getProgramBadge(participant.program)}
-                            {getPaymentBadge(participant.paymentStatus)}
-                          </div>
                         </div>
+
+                        {/* Status badges - Stacked on mobile */}
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-8 sm:pl-11">
+                          {getProgramBadge(participant.program)}
+                          {getPaymentBadge(participant.paymentStatus)}
+                        </div>
+
+                        {/* Equipment display - Wrapped on mobile */}
                         {equipmentDisplay && (
-                          <div className="flex flex-wrap gap-2 pl-11">
+                          <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-8 sm:pl-11">
                             {equipmentDisplay}
                           </div>
                         )}
@@ -329,20 +337,20 @@ export function ParticipantsModal({
                 </ul>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Search className="w-12 h-12 text-muted-foreground/30 mb-3" />
-                <p className="text-muted-foreground font-inter">
+              <div className="flex flex-col items-center justify-center py-8 sm:py-12">
+                <Search className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/30 mb-2 sm:mb-3" />
+                <p className="text-sm sm:text-base text-muted-foreground font-inter text-center">
                   {searchQuery || paymentFilter !== 'all' ? 'Участники не найдены' : 'Нет данных об участниках'}
                 </p>
               </div>
             )}
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-border/30 p-4 flex justify-end">
+          {/* Footer - Responsive */}
+          <div className="border-t border-border/30 p-3 sm:p-4 flex justify-end gap-2 sm:gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-inter font-medium
+              className="px-3 sm:px-4 py-2 sm:py-2 bg-primary text-primary-foreground rounded-lg font-inter text-sm sm:text-base font-medium
                          hover:bg-primary/90 transition-colors duration-200"
             >
               Закрыть
