@@ -31,6 +31,7 @@ interface Participant {
   harness?: string | null;
   wing?: string | null;
   helmet?: string | null;
+  telegramNick?: string | null;
 }
 
 interface Trip {

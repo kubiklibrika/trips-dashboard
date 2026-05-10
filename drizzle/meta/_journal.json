@@ -36,6 +36,13 @@
       "when": 1777988169229,
       "tag": "0004_amused_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1778438845915,
+      "tag": "0005_naive_hairball",
+      "breakpoints": true
     }
   ]
 }

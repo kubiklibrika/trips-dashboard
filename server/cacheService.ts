@@ -53,6 +53,7 @@ export async function refreshCache() {
               harness: participant.harness,
               wing: participant.wing,
               helmet: participant.helmet,
+              telegramNick: participant.telegramNick,
             });
           }
         }

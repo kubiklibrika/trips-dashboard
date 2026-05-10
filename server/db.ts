@@ -202,6 +202,7 @@ export async function upsertParticipant(participant: InsertParticipant): Promise
         harness: participant.harness,
         wing: participant.wing,
         helmet: participant.helmet,
+        telegramNick: participant.telegramNick,
       },
     });
     return participant as Participant;

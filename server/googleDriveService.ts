@@ -8,6 +8,7 @@ interface Participant {
   harness?: string;
   wing?: string;
   helmet?: string;
+  telegramNick?: string;
 }
 
 interface Trip {
@@ -168,6 +169,13 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       program = programValue;
     }
 
+    // Get telegram nick from column D
+    let telegramNick: string | undefined = undefined;
+    const telegramNickValue = (row["D"] || row["Telegram"] || row["Ник"] || "").toString().trim();
+    if (telegramNickValue && telegramNickValue !== "-") {
+      telegramNick = telegramNickValue;
+    }
+
     // Get equipment from merged column or separate columns
     let harness: string | undefined = undefined;
     let wing: string | undefined = undefined;
@@ -198,7 +206,7 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       }
     }
 
-    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}" | Equipment: ${harness}, ${wing}, ${helmet}`);
+    console.log(`[DEBUG] Name: "${name}" | Payment: "${paymentValue}" | Status: ${paymentStatus} | Program: "${program}" | TelegramNick: "${telegramNick}" | Equipment: ${harness}, ${wing}, ${helmet}`);
 
     participants.push({
       name,
@@ -207,6 +215,7 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
       harness,
       wing,
       helmet,
+      telegramNick,
     });
   }
 

@@ -1,14 +1,15 @@
 /**
- * ParticipantsModal Component
+ * ParticipantsModal Component - Variant 2: BOLD & MODERN
  * 
- * Design Philosophy: Neomorphic modal with smooth animations
- * - Displays list of participants for a trip with payment status and program
- * - Search field to filter participants by name
- * - Filter buttons for payment status
- * - Smooth entrance/exit animations
- * - Clean, readable list format
- * - Equipment display (harness, wing, helmet) under each participant
- * - Fully responsive mobile-first design
+ * Design Philosophy: Bold typography with strong visual hierarchy
+ * - Large vibrant headline with navy blue color
+ * - Accent color bar on left side (blue to purple gradient)
+ * - Dates in contrasting orange/coral color
+ * - Participant cards with rounded corners and background color
+ * - Larger payment status badges with icons
+ * - Equipment section with colored tags
+ * - Generous padding and spacing
+ * - Modern tech feel with smooth rounded corners
  */
 
 import { useState, useMemo } from 'react';
@@ -21,6 +22,7 @@ interface Participant {
   harness?: string | null;
   wing?: string | null;
   helmet?: string | null;
+  telegramNick?: string | null;
 }
 
 interface ParticipantsModalProps {
@@ -72,52 +74,25 @@ export function ParticipantsModal({
     return { paid, unpaid, total: participants.length };
   }, [participants]);
 
-  // Calculate program statistics
-  const programStats = useMemo(() => {
-    const beginners = participants.filter(p => p.program && p.program.toLowerCase().includes('с нуля')).length;
-    const others = participants.filter(p => p.program && !p.program.toLowerCase().includes('с нуля')).length;
-    return { beginners, others };
-  }, [participants]);
-
   if (!isOpen) return null;
 
   const getPaymentBadge = (status: string) => {
     if (status === 'paid') {
       return (
-        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-green-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 flex-shrink-0" />
-          <span className="font-medium text-green-700">Оплачено</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 rounded-full whitespace-nowrap text-xs font-semibold">
+          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+          <span className="text-green-700">ОПЛАЧЕНО</span>
         </div>
       );
     } else if (status === 'unpaid') {
       return (
-        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-red-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600 flex-shrink-0" />
-          <span className="font-medium text-red-700">Не оплачено</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 rounded-full whitespace-nowrap text-xs font-semibold">
+          <AlertCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+          <span className="text-orange-700">ОЖИДАЕТ</span>
         </div>
       );
     }
     return null;
-  };
-
-  const getProgramBadge = (program: string) => {
-    if (!program) return null;
-    
-    const isBeginner = program.toLowerCase().includes('с нуля');
-    
-    if (isBeginner) {
-      return (
-        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-blue-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <span className="font-medium text-blue-700">С нуля</span>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 bg-purple-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <span className="font-medium text-purple-700 truncate">{program}</span>
-        </div>
-      );
-    }
   };
 
   const getEquipmentDisplay = (participant: Participant) => {
@@ -125,27 +100,27 @@ export function ParticipantsModal({
     
     if (participant.harness) {
       equipment.push(
-        <div key="harness" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-amber-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600 flex-shrink-0" />
-          <span className="font-medium text-amber-700 truncate">{participant.harness}</span>
+        <div key="harness" className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 rounded-lg whitespace-nowrap text-xs font-semibold">
+          <Zap className="w-4 h-4 text-blue-600 flex-shrink-0" />
+          <span className="text-blue-700 truncate">ПОДВЕСКА</span>
         </div>
       );
     }
     
     if (participant.wing) {
       equipment.push(
-        <div key="wing" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-cyan-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <Wind className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-cyan-600 flex-shrink-0" />
-          <span className="font-medium text-cyan-700 truncate">{participant.wing}</span>
+        <div key="wing" className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 rounded-lg whitespace-nowrap text-xs font-semibold">
+          <Wind className="w-4 h-4 text-green-600 flex-shrink-0" />
+          <span className="text-green-700 truncate">КРЫЛО</span>
         </div>
       );
     }
     
     if (participant.helmet) {
       equipment.push(
-        <div key="helmet" className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-slate-50 rounded-full whitespace-nowrap text-xs sm:text-xs">
-          <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-600 flex-shrink-0" />
-          <span className="font-medium text-slate-700 truncate">{participant.helmet}</span>
+        <div key="helmet" className="flex items-center gap-1.5 px-3 py-1.5 bg-red-100 rounded-lg whitespace-nowrap text-xs font-semibold">
+          <Shield className="w-4 h-4 text-red-600 flex-shrink-0" />
+          <span className="text-red-700 truncate">ШЛЕМ</span>
         </div>
       );
     }
@@ -164,197 +139,177 @@ export function ParticipantsModal({
       {/* Modal - Fully responsive */}
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div
-          className="bg-card text-card-foreground rounded-t-2xl sm:rounded-[16px] shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                     w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col
-                     border border-border/50"
+          className="bg-white text-gray-900 rounded-t-3xl sm:rounded-2xl shadow-2xl
+                     w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border/30">
-            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg flex-shrink-0">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="font-poppins font-semibold text-base sm:text-xl text-foreground truncate">
+          {/* Close button - positioned absolutely */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 sm:hidden"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+
+          {/* Header with accent bar */}
+          <div className="relative px-5 sm:px-8 pt-6 sm:pt-8 pb-4 sm:pb-6 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200">
+            {/* Accent bar on the left */}
+            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-600 to-purple-600 rounded-r-full" />
+            
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                {/* Trip title - Large and bold */}
+                <h1 className="font-bold text-3xl sm:text-4xl text-gray-900 leading-tight mb-2">
                   {tripTitle}
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground font-inter">
-                  {tripDate}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-1.5 sm:p-2 hover:bg-secondary rounded-lg transition-colors duration-200 flex-shrink-0 ml-2"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-            </button>
-          </div>
+                </h1>
+                
+                {/* Trip date - Orange/coral color */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-5 h-5 text-orange-500">📅</div>
+                  <p className="font-bold text-lg sm:text-xl text-orange-600">
+                    {tripDate}
+                  </p>
+                </div>
 
-          {/* Stats section - Responsive grid */}
-          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-2 border-b border-border/30">
-            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
-              <div className="p-2.5 sm:p-3 bg-secondary/30 rounded-lg">
-                <p className="text-xs text-muted-foreground font-inter uppercase tracking-wider mb-1">
-                  Всего
-                </p>
-                <p className="font-poppins font-semibold text-base sm:text-lg text-foreground">
-                  {stats.total}
-                </p>
+                {/* Stats - Participants count */}
+                <div className="flex items-center gap-3">
+                  <div className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-sm">
+                    {stats.total} УЧАСТНИКОВ
+                  </div>
+                  <div className="text-sm text-gray-600 font-medium">
+                    {stats.paid} оплачено • {stats.unpaid} ожидает
+                  </div>
+                </div>
               </div>
-              <div className="p-2.5 sm:p-3 bg-green-50 rounded-lg">
-                <p className="text-xs text-green-700 font-inter uppercase tracking-wider mb-1">
-                  Оплачено
-                </p>
-                <p className="font-poppins font-semibold text-base sm:text-lg text-green-600">
-                  {stats.paid}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="p-2.5 sm:p-3 bg-red-50 rounded-lg">
-                <p className="text-xs text-red-700 font-inter uppercase tracking-wider mb-1">
-                  Не оплачено
-                </p>
-                <p className="font-poppins font-semibold text-base sm:text-lg text-red-600">
-                  {stats.unpaid}
-                </p>
-              </div>
-              <div className="p-2.5 sm:p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-blue-700 font-inter uppercase tracking-wider mb-1">
-                  С нуля
-                </p>
-                <p className="font-poppins font-semibold text-base sm:text-lg text-blue-600">
-                  {programStats.beginners}
-                </p>
-              </div>
+
+              {/* Close button for desktop */}
+              <button
+                onClick={onClose}
+                className="hidden sm:flex p-2 hover:bg-gray-200 rounded-full transition-colors duration-200 flex-shrink-0"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
             </div>
           </div>
 
-          {/* Search and filter section - Responsive */}
-          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-3 sm:pb-4 border-b border-border/30 space-y-2.5 sm:space-y-3">
+          {/* Search and filter section */}
+          <div className="px-5 sm:px-8 py-4 sm:py-5 border-b border-gray-200 space-y-3 bg-white">
             {/* Search field */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Поиск по имени..."
+                placeholder="Поиск по имени или фамилии..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 bg-secondary/50 text-foreground placeholder-muted-foreground text-sm sm:text-base
-                           rounded-lg border border-border/50 focus:outline-none focus:ring-2 focus:ring-primary/50
-                           font-inter transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 text-gray-900 placeholder-gray-500 text-sm
+                           rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                           font-medium transition-all duration-200"
               />
             </div>
 
-            {/* Filter buttons - Responsive */}
-            <div className="flex gap-1.5 sm:gap-2 flex-wrap">
+            {/* Filter buttons */}
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setPaymentFilter('all')}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 ${
+                className={`px-3 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 ${
                   paymentFilter === 'all'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary/50 text-foreground hover:bg-secondary'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
-                Все
+                ВСЕ
               </button>
               <button
                 onClick={() => setPaymentFilter('paid')}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
+                className={`px-3 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 ${
                   paymentFilter === 'paid'
                     ? 'bg-green-600 text-white'
-                    : 'bg-green-50 text-green-700 hover:bg-green-100'
+                    : 'bg-green-100 text-green-700 hover:bg-green-200'
                 }`}
               >
-                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Оплачено</span>
-                <span className="sm:hidden">Опл.</span>
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="hidden sm:inline">ОПЛАЧЕНО</span>
+                <span className="sm:hidden">ОПЛ.</span>
               </button>
               <button
                 onClick={() => setPaymentFilter('unpaid')}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg font-inter text-xs sm:text-sm font-medium transition-all duration-200 flex items-center gap-1 ${
+                className={`px-3 py-2 rounded-lg font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-1.5 ${
                   paymentFilter === 'unpaid'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-red-50 text-red-700 hover:bg-red-100'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
                 }`}
               >
-                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Не оплачено</span>
-                <span className="sm:hidden">Не опл.</span>
+                <AlertCircle className="w-4 h-4" />
+                <span className="hidden sm:inline">ОЖИДАЕТ</span>
+                <span className="sm:hidden">ОЖД.</span>
               </button>
             </div>
           </div>
 
-          {/* Content - Responsive list */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+          {/* Participants list */}
+          <div className="flex-1 overflow-y-auto">
             {filteredParticipants.length > 0 ? (
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground font-inter uppercase tracking-wider mb-3 sm:mb-4">
-                  Найдено: <span className="font-poppins font-semibold text-primary">{filteredParticipants.length}</span>
-                  {(searchQuery || paymentFilter !== 'all') && <span className="text-xs ml-2">из {participants.length}</span>}
-                </p>
-                <ul className="space-y-2 sm:space-y-3">
-                  {filteredParticipants.map((participant, index) => {
-                    // Find original index for numbering
-                    const originalIndex = participants.indexOf(participant);
-                    const equipmentDisplay = getEquipmentDisplay(participant);
-                    return (
-                      <li
-                        key={index}
-                        className="flex flex-col gap-2 p-3 sm:p-4 rounded-lg hover:bg-secondary/50 transition-colors duration-150 border border-border/20"
-                      >
-                        {/* Name and badges row */}
-                        <div className="flex items-start justify-between gap-2 sm:gap-4">
-                          <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                            <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mt-0.5">
-                              <span className="text-xs sm:text-xs font-poppins font-semibold text-primary">
-                                {originalIndex + 1}
-                              </span>
-                            </div>
-                            <span className="font-inter text-sm sm:text-base text-foreground font-medium truncate">
-                              {participant.name}
+              <div className="px-5 sm:px-8 py-4 sm:py-6 space-y-3 sm:space-y-4">
+                {filteredParticipants.map((participant, index) => (
+                  <div
+                    key={index}
+                    className="p-4 sm:p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-200"
+                  >
+                    {/* Avatar and Name with payment status */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-start gap-3 flex-1">
+                        {/* Avatar */}
+                        {participant.telegramNick ? (
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <span className="text-white font-bold text-sm sm:text-base">
+                              {participant.telegramNick.substring(0, 2).toUpperCase()}
                             </span>
                           </div>
-                        </div>
-
-                        {/* Status badges - Stacked on mobile */}
-                        <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-8 sm:pl-11">
-                          {getProgramBadge(participant.program)}
-                          {getPaymentBadge(participant.paymentStatus)}
-                        </div>
-
-                        {/* Equipment display - Wrapped on mobile */}
-                        {equipmentDisplay && (
-                          <div className="flex flex-wrap gap-1.5 sm:gap-2 pl-8 sm:pl-11">
-                            {equipmentDisplay}
+                        ) : (
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                            <span className="text-gray-600 font-bold text-sm">?</span>
                           </div>
                         )}
-                      </li>
-                    );
-                  })}
-                </ul>
+                        
+                        {/* Name and telegram nick */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-base sm:text-lg text-gray-900 leading-tight">
+                            {participant.name}
+                          </h3>
+                          {participant.telegramNick && (
+                            <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">
+                              @{participant.telegramNick}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {getPaymentBadge(participant.paymentStatus)}
+                    </div>
+
+                    {/* Program */}
+                    {participant.program && (
+                      <p className="text-xs sm:text-sm text-gray-600 font-medium mb-3 pl-0">
+                        {participant.program}
+                      </p>
+                    )}
+
+                    {/* Equipment tags */}
+                    {getEquipmentDisplay(participant) && (
+                      <div className="flex flex-wrap gap-2">
+                        {getEquipmentDisplay(participant)}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-                <Search className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/30 mb-2 sm:mb-3" />
-                <p className="text-sm sm:text-base text-muted-foreground font-inter text-center">
-                  {searchQuery || paymentFilter !== 'all' ? 'Участники не найдены' : 'Нет данных об участниках'}
+              <div className="flex items-center justify-center h-32 sm:h-40">
+                <p className="text-gray-500 font-medium text-center">
+                  {searchQuery ? 'Участников не найдено' : 'Нет участников'}
                 </p>
               </div>
             )}
-          </div>
-
-          {/* Footer - Responsive */}
-          <div className="border-t border-border/30 p-3 sm:p-4 flex justify-end gap-2 sm:gap-3">
-            <button
-              onClick={onClose}
-              className="px-3 sm:px-4 py-2 sm:py-2 bg-primary text-primary-foreground rounded-lg font-inter text-sm sm:text-base font-medium
-                         hover:bg-primary/90 transition-colors duration-200"
-            >
-              Закрыть
-            </button>
           </div>
         </div>
       </div>
