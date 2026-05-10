@@ -182,7 +182,9 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
     }
     const telegramNickValue = (row["D"] || row["Telegram"] || row["Ник"] || row["Telegram nick"] || row["Telegram ник"] || "").toString().trim();
     if (telegramNickValue && telegramNickValue !== "-") {
-      telegramNick = telegramNickValue;
+      // Remove leading @ if present, and clean up duplicates
+      let cleanedNick = telegramNickValue.replace(/^@+/, '').trim();
+      telegramNick = cleanedNick;
       console.log(`[GoogleDriveService] Found telegram nick for ${row["ФИО"]}: ${telegramNick}`);
     }
 

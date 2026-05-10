@@ -1,0 +1,25 @@
+{
+  "query": "SELECT name, telegramNick, avatarUrl FROM participants WHERE name LIKE '%Артем%' OR telegramNick LIKE '%RS775011%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3rV6qw1Q5sewgif.root --database Y478AcgKFLZ2Ut57UzHwjN --execute SELECT name, telegramNick, avatarUrl FROM participants WHERE name LIKE '%Артем%' OR telegramNick LIKE '%RS775011%' LIMIT 10;",
+  "rows": [
+    {
+      "name": "Свирина Надежда Артемовна",
+      "telegramNick": "@espe_rance",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=espe_rance&scale=80"
+    },
+    {
+      "name": "Смыслов Артем",
+      "telegramNick": "@RS775011",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=RS775011&scale=80"
+    },
+    {
+      "name": "Артем (Директор)",
+      "telegramNick": "@RS775011",
+      "avatarUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=RS775011&scale=80"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\ttelegramNick\tavatarUrl\nСвирина Надежда Артемовна\t@espe_rance\thttps://api.dicebear.com/7.x/avataaars/svg?seed=espe_rance&scale=80\nСмыслов Артем\t@RS775011\thttps://api.dicebear.com/7.x/avataaars/svg?seed=RS775011&scale=80\nАртем (Директор)\t@RS775011\thttps://api.dicebear.com/7.x/avataaars/svg?seed=RS775011&scale=80\n",
+  "stderr": "",
+  "execution_time_ms": 617
+}

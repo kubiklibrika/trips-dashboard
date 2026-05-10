@@ -44,12 +44,20 @@ function AvatarDisplay({ participant }: { participant: Participant }) {
 
   // If we have an avatar URL and it hasn't failed, try to load it
   if (participant.avatarUrl && !imageError) {
+    // Check if it's a Telegram URL - if so, use CORS proxy
+    let imageUrl = participant.avatarUrl;
+    if (participant.avatarUrl.includes('t.me/i/userpic')) {
+      // Use CORS proxy for Telegram images
+      imageUrl = `https://corsproxy.io/?${encodeURIComponent(participant.avatarUrl)}`;
+    }
+    
     return (
       <img
-        src={participant.avatarUrl}
+        src={imageUrl}
         alt={participant.name}
         className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
         onError={() => setImageError(true)}
+        loading="lazy"
       />
     );
   }
@@ -62,6 +70,7 @@ function AvatarDisplay({ participant }: { participant: Participant }) {
         src={dicebearUrl}
         alt={participant.name}
         className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
+        loading="lazy"
       />
     );
   }

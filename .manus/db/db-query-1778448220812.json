@@ -1,0 +1,60 @@
+{
+  "query": "SELECT name, telegramNick, avatarUrl FROM participants WHERE avatarUrl IS NOT NULL AND avatarUrl NOT LIKE '%dicebear%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3rV6qw1Q5sewgif.root --database Y478AcgKFLZ2Ut57UzHwjN --execute SELECT name, telegramNick, avatarUrl FROM participants WHERE avatarUrl IS NOT NULL AND avatarUrl NOT LIKE '%dicebear%' LIMIT 10;",
+  "rows": [
+    {
+      "name": "Николай",
+      "telegramNick": "fullcrimp",
+      "avatarUrl": "https://t.me/i/userpic/320/fullcrimp.jpg"
+    },
+    {
+      "name": "Бадртдинов Линар Назимович",
+      "telegramNick": "lineair",
+      "avatarUrl": "https://t.me/i/userpic/320/lineair.jpg"
+    },
+    {
+      "name": "Казакова Лада Сергеевна",
+      "telegramNick": "ladadelrey",
+      "avatarUrl": "https://t.me/i/userpic/320/ladadelrey.jpg"
+    },
+    {
+      "name": "Александр Карловский",
+      "telegramNick": "AKarlovskiy",
+      "avatarUrl": "https://t.me/i/userpic/320/AKarlovskiy.jpg"
+    },
+    {
+      "name": "Александр Карпов",
+      "telegramNick": "Cayman888",
+      "avatarUrl": "https://t.me/i/userpic/320/Cayman888.jpg"
+    },
+    {
+      "name": "Зоя",
+      "telegramNick": "tza28",
+      "avatarUrl": "https://t.me/i/userpic/320/tza28.jpg"
+    },
+    {
+      "name": "Неуважаева Мария Андреевна",
+      "telegramNick": "MariaNeuvazhaeva",
+      "avatarUrl": "https://t.me/i/userpic/320/MariaNeuvazhaeva.jpg"
+    },
+    {
+      "name": "Халимов Данил Радикович",
+      "telegramNick": "danil_khalimov",
+      "avatarUrl": "https://t.me/i/userpic/320/danil_khalimov.jpg"
+    },
+    {
+      "name": "Ася",
+      "telegramNick": "asinia_er",
+      "avatarUrl": "https://t.me/i/userpic/320/asinia_er.jpg"
+    },
+    {
+      "name": "Марк",
+      "telegramNick": "mikealfaromeokilo",
+      "avatarUrl": "https://t.me/i/userpic/320/mikealfaromeokilo.jpg"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\ttelegramNick\tavatarUrl\nНиколай\tfullcrimp\thttps://t.me/i/userpic/320/fullcrimp.jpg\nБадртдинов Линар Назимович\tlineair\thttps://t.me/i/userpic/320/lineair.jpg\nКазакова Лада Сергеевна\tladadelrey\thttps://t.me/i/userpic/320/ladadelrey.jpg\nАлександр Карловский\tAKarlovskiy\thttps://t.me/i/userpic/320/AKarlovskiy.jpg\nАлександр Карпов\tCayman888\thttps://t.me/i/userpic/320/Cayman888.jpg\nЗоя\ttza28\thttps://t.me/i/userpic/320/tza28.jpg\nНеуважаева Мария Андреевна\tMariaNeuvazhaeva\thttps://t.me/i/userpic/320/MariaNeuvazhaeva.jpg\nХалимов Данил Радикович\tdanil_khalimov\thttps://t.me/i/userpic/320/danil_khalimov.jpg\nАся\tasinia_er\thttps://t.me/i/userpic/320/asinia_er.jpg\nМарк\tmikealfaromeokilo\thttps://t.me/i/userpic/320/mikealfaromeokilo.jpg\n",
+  "stderr": "",
+  "execution_time_ms": 588
+}

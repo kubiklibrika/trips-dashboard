@@ -75,39 +75,45 @@ export async function getTelegramAvatarUrl(username: string): Promise<string> {
 /**
  * Get avatar from Telegram Web API
  * This works for public profiles without requiring bot interaction
+ * Returns the direct CDN URL that can be used in img src
  */
 async function getAvatarFromWebApi(username: string): Promise<string | null> {
   try {
-    // Try to fetch profile photo from Telegram Web
-    // This uses the public Telegram CDN for profile pictures
     const cleanUsername = username.startsWith("@") ? username.slice(1) : username;
     
-    // Attempt to get profile picture from Telegram's CDN
-    // Format: https://t.me/i/userpic/320/{username}.jpg
-    const avatarUrl = `https://t.me/i/userpic/320/${cleanUsername}.jpg`;
+    // Try different resolutions in order of preference
+    const resolutions = [320, 200, 160, 100];
     
-    // Verify the URL is accessible
-    const response = await axios.head(avatarUrl, { timeout: 5000 });
-    if (response.status === 200) {
-      return avatarUrl;
-    }
-  } catch (error) {
-    // URL not accessible, try alternative format
-    try {
-      const cleanUsername = username.startsWith("@") ? username.slice(1) : username;
-      const avatarUrl = `https://t.me/i/userpic/200/${cleanUsername}.jpg`;
+    for (const resolution of resolutions) {
+      const avatarUrl = `https://t.me/i/userpic/${resolution}/${cleanUsername}.jpg`;
       
-      const response = await axios.head(avatarUrl, { timeout: 5000 });
-      if (response.status === 200) {
-        return avatarUrl;
+      try {
+        // Use GET request with minimal data to check if image exists
+        // Telegram blocks HEAD requests, so we use GET with responseType
+        const response = await axios.get(avatarUrl, { 
+          timeout: 5000,
+          responseType: 'arraybuffer',
+          maxRedirects: 5,
+          validateStatus: (status) => status >= 200 && status < 400
+        });
+        
+        if (response.status === 200 && response.data && response.data.byteLength > 100) {
+          console.log(`[TelegramAvatarService] Found avatar at resolution ${resolution} for @${cleanUsername}`);
+          // Return the highest resolution URL that works
+          return `https://t.me/i/userpic/320/${cleanUsername}.jpg`;
+        }
+      } catch (err) {
+        // This resolution didn't work, try next one
+        continue;
       }
-    } catch (innerError) {
-      // Both attempts failed, return null to try other strategies
-      console.debug(`[TelegramAvatarService] Web API failed for @${username}`);
     }
+    
+    console.debug(`[TelegramAvatarService] No working avatar resolution found for @${cleanUsername}`);
+    return null;
+  } catch (error) {
+    console.error(`[TelegramAvatarService] Error in getAvatarFromWebApi for @${username}:`, error instanceof Error ? error.message : 'Unknown error');
+    return null;
   }
-  
-  return null;
 }
 
 /**
