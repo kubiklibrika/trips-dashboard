@@ -187,6 +187,9 @@ export async function getParticipantsByTrip(tripId: number): Promise<Participant
   }
 }
 
+/**
+ * Upsert participant with avatar URL caching
+ */
 export async function upsertParticipant(participant: InsertParticipant): Promise<Participant | null> {
   const db = await getDb();
   if (!db) {
@@ -203,6 +206,8 @@ export async function upsertParticipant(participant: InsertParticipant): Promise
         wing: participant.wing,
         helmet: participant.helmet,
         telegramNick: participant.telegramNick,
+        avatarUrl: participant.avatarUrl,
+        avatarCachedAt: participant.avatarCachedAt,
       },
     });
     return participant as Participant;

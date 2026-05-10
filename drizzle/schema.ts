@@ -50,6 +50,8 @@ export const participants = mysqlTable("participants", {
   wing: varchar("wing", { length: 255 }),
   helmet: varchar("helmet", { length: 255 }),
   telegramNick: varchar("telegramNick", { length: 255 }),
+  avatarUrl: varchar("avatarUrl", { length: 500 }),
+  avatarCachedAt: timestamp("avatarCachedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

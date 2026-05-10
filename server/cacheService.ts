@@ -1,6 +1,7 @@
 import { loadTripsFromGoogleDrive } from "./googleDriveService";
 import { trackAndNotifyChanges } from "./changeTracker";
 import { getAllTrips, clearAllTripsAndParticipants, upsertTrip, upsertParticipant } from "./db";
+import { getTelegramAvatarUrl } from "./telegramAvatarService";
 
 const SYNC_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 let lastSyncTime = 0;
@@ -45,6 +46,16 @@ export async function refreshCache() {
         
         if (savedTrip) {
           for (const participant of trip.participantsList) {
+            // Get avatar URL if telegram nick is available
+            let avatarUrl: string | undefined;
+            if (participant.telegramNick) {
+              try {
+                avatarUrl = await getTelegramAvatarUrl(participant.telegramNick);
+              } catch (error) {
+                console.warn(`[Cache] Failed to get avatar for ${participant.telegramNick}:`, error);
+              }
+            }
+            
             await upsertParticipant({
               tripId: savedTrip.id,
               name: participant.name,
@@ -54,6 +65,8 @@ export async function refreshCache() {
               wing: participant.wing,
               helmet: participant.helmet,
               telegramNick: participant.telegramNick,
+              avatarUrl,
+              avatarCachedAt: avatarUrl ? new Date() : undefined,
             });
           }
         }

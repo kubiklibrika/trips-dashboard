@@ -23,6 +23,7 @@ interface Participant {
   wing?: string | null;
   helmet?: string | null;
   telegramNick?: string | null;
+  avatarUrl?: string | null;
 }
 
 interface ParticipantsModalProps {
@@ -260,7 +261,18 @@ export function ParticipantsModal({
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-start gap-3 flex-1">
                         {/* Avatar */}
-                        {participant.telegramNick ? (
+                        {participant.avatarUrl ? (
+                          <img
+                            src={participant.avatarUrl}
+                            alt={participant.name}
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
+                            onError={(e) => {
+                              // Fallback to gradient if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        ) : participant.telegramNick ? (
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
                             <span className="text-white font-bold text-sm sm:text-base">
                               {participant.telegramNick.substring(0, 2).toUpperCase()}
