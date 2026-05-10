@@ -123,7 +123,11 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
     }
   }
 
+  let debugLogged = false;
+  let rowIndex = 0;
+  
   for (const row of rows) {
+    rowIndex++;
     // Skip header rows and empty rows
     if (!row || typeof row !== "object") continue;
 
@@ -171,9 +175,15 @@ export async function parseExcelFile(buffer: Buffer): Promise<Participant[]> {
 
     // Get telegram nick from column D
     let telegramNick: string | undefined = undefined;
-    const telegramNickValue = (row["D"] || row["Telegram"] || row["Ник"] || "").toString().trim();
+    // Log available keys for first participant to debug
+    if (rowIndex === 1 && !debugLogged) {
+      console.log('[GoogleDriveService] Available keys for participant:', Object.keys(row).slice(0, 20));
+      debugLogged = true;
+    }
+    const telegramNickValue = (row["D"] || row["Telegram"] || row["Ник"] || row["Telegram nick"] || row["Telegram ник"] || "").toString().trim();
     if (telegramNickValue && telegramNickValue !== "-") {
       telegramNick = telegramNickValue;
+      console.log(`[GoogleDriveService] Found telegram nick for ${row["ФИО"]}: ${telegramNick}`);
     }
 
     // Get equipment from merged column or separate columns

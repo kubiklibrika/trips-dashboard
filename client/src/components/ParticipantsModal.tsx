@@ -36,6 +36,53 @@ interface ParticipantsModalProps {
 
 type PaymentFilter = 'all' | 'paid' | 'unpaid';
 
+/**
+ * Avatar Display Component with smart fallback
+ */
+function AvatarDisplay({ participant }: { participant: Participant }) {
+  const [imageError, setImageError] = useState(false);
+
+  // If we have an avatar URL and it hasn't failed, try to load it
+  if (participant.avatarUrl && !imageError) {
+    return (
+      <img
+        src={participant.avatarUrl}
+        alt={participant.name}
+        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
+        onError={() => setImageError(true)}
+      />
+    );
+  }
+
+  // Fallback to DiceBear avatar using telegram nick
+  if (participant.telegramNick) {
+    const dicebearUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(participant.telegramNick)}&scale=80`;
+    return (
+      <img
+        src={dicebearUrl}
+        alt={participant.name}
+        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
+      />
+    );
+  }
+
+  // Last resort: gradient with initials
+  const initials = participant.name
+    .split(' ')
+    .slice(0, 2)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  return (
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
+      <span className="text-white font-bold text-sm sm:text-base">
+        {initials || '?'}
+      </span>
+    </div>
+  );
+}
+
 export function ParticipantsModal({
   isOpen,
   onClose,
@@ -260,29 +307,8 @@ export function ParticipantsModal({
                     {/* Avatar and Name with payment status */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-start gap-3 flex-1">
-                        {/* Avatar */}
-                        {participant.avatarUrl ? (
-                          <img
-                            src={participant.avatarUrl}
-                            alt={participant.name}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 shadow-md border-2 border-white"
-                            onError={(e) => {
-                              // Fallback to gradient if image fails to load
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
-                        ) : participant.telegramNick ? (
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <span className="text-white font-bold text-sm sm:text-base">
-                              {participant.telegramNick.substring(0, 2).toUpperCase()}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
-                            <span className="text-gray-600 font-bold text-sm">?</span>
-                          </div>
-                        )}
+                        {/* Avatar with smart fallback */}
+                        <AvatarDisplay participant={participant} />
                         
                         {/* Name and telegram nick */}
                         <div className="flex-1 min-w-0">

@@ -1,7 +1,7 @@
 /**
  * Telegram Avatar Service
- * Provides functions to get user profile photos from Telegram Bot API
- * Fetches real profile photos and caches them for performance
+ * Provides functions to get user profile photos from Telegram
+ * Uses multiple strategies: Bot API, Web API, and fallback to placeholder
  */
 
 import axios from 'axios';
@@ -15,11 +15,10 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Get user profile photo from Telegram by username
- * First tries to resolve username to user ID, then fetches profile photos
- * Falls back to placeholder avatar if user not found or error occurs
+ * Tries multiple strategies to get the avatar
  */
 export async function getTelegramAvatarUrl(username: string): Promise<string> {
-  if (!username || !TELEGRAM_BOT_TOKEN) {
+  if (!username) {
     return getPlaceholderAvatar(username);
   }
 
@@ -33,40 +32,82 @@ export async function getTelegramAvatarUrl(username: string): Promise<string> {
       return cached.url;
     }
 
-    // Try to get user info by username using getChat endpoint
-    // This requires the bot to be in a chat with the user or the user to have made the bot a contact
-    const userInfo = await getUserInfoByUsername(cleanUsername);
+    // Strategy 1: Try to get avatar from Telegram Web API (works for public profiles)
+    let avatarUrl = await getAvatarFromWebApi(cleanUsername);
     
-    if (userInfo && userInfo.id) {
-      // Get user profile photos
-      const photos = await getUserProfilePhotos(userInfo.id);
+    if (avatarUrl) {
+      // Cache the URL
+      avatarCache.set(cleanUsername, { url: avatarUrl, timestamp: Date.now() });
+      console.log(`[TelegramAvatarService] Successfully fetched avatar for @${cleanUsername} from Web API`);
+      return avatarUrl;
+    }
+
+    // Strategy 2: Try Bot API if we have token
+    if (TELEGRAM_BOT_TOKEN) {
+      const userInfo = await getUserInfoByUsername(cleanUsername);
       
-      if (photos && photos.total_count > 0) {
-        // Get the first (most recent) photo
-        const photoFileId = photos.photos[0][0].file_id;
+      if (userInfo && userInfo.id) {
+        const photos = await getUserProfilePhotos(userInfo.id);
         
-        // Get file info to construct download URL
-        const fileInfo = await getFile(photoFileId);
-        
-        if (fileInfo && fileInfo.file_path) {
-          const avatarUrl = `${TELEGRAM_API_URL}/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.file_path}`;
+        if (photos && photos.total_count > 0) {
+          const photoFileId = photos.photos[0][0].file_id;
+          const fileInfo = await getFile(photoFileId);
           
-          // Cache the URL
-          avatarCache.set(cleanUsername, { url: avatarUrl, timestamp: Date.now() });
-          console.log(`[TelegramAvatarService] Successfully fetched avatar for ${cleanUsername}`);
-          
-          return avatarUrl;
+          if (fileInfo && fileInfo.file_path) {
+            avatarUrl = `${TELEGRAM_API_URL}/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.file_path}`;
+            avatarCache.set(cleanUsername, { url: avatarUrl, timestamp: Date.now() });
+            console.log(`[TelegramAvatarService] Successfully fetched avatar for @${cleanUsername} from Bot API`);
+            return avatarUrl;
+          }
         }
       }
     }
     
     // Fallback to placeholder if no photos found
-    console.log(`[TelegramAvatarService] No profile photos found for ${cleanUsername}, using placeholder`);
+    console.log(`[TelegramAvatarService] No profile photos found for @${cleanUsername}, using placeholder`);
     return getPlaceholderAvatar(cleanUsername);
   } catch (error) {
-    console.error(`[TelegramAvatarService] Error getting avatar for ${username}:`, error);
+    console.error(`[TelegramAvatarService] Error getting avatar for ${username}:`, error instanceof Error ? error.message : 'Unknown error');
     return getPlaceholderAvatar(username);
   }
+}
+
+/**
+ * Get avatar from Telegram Web API
+ * This works for public profiles without requiring bot interaction
+ */
+async function getAvatarFromWebApi(username: string): Promise<string | null> {
+  try {
+    // Try to fetch profile photo from Telegram Web
+    // This uses the public Telegram CDN for profile pictures
+    const cleanUsername = username.startsWith("@") ? username.slice(1) : username;
+    
+    // Attempt to get profile picture from Telegram's CDN
+    // Format: https://t.me/i/userpic/320/{username}.jpg
+    const avatarUrl = `https://t.me/i/userpic/320/${cleanUsername}.jpg`;
+    
+    // Verify the URL is accessible
+    const response = await axios.head(avatarUrl, { timeout: 5000 });
+    if (response.status === 200) {
+      return avatarUrl;
+    }
+  } catch (error) {
+    // URL not accessible, try alternative format
+    try {
+      const cleanUsername = username.startsWith("@") ? username.slice(1) : username;
+      const avatarUrl = `https://t.me/i/userpic/200/${cleanUsername}.jpg`;
+      
+      const response = await axios.head(avatarUrl, { timeout: 5000 });
+      if (response.status === 200) {
+        return avatarUrl;
+      }
+    } catch (innerError) {
+      // Both attempts failed, return null to try other strategies
+      console.debug(`[TelegramAvatarService] Web API failed for @${username}`);
+    }
+  }
+  
+  return null;
 }
 
 /**
@@ -87,9 +128,7 @@ async function getUserInfoByUsername(username: string): Promise<any> {
     }
   } catch (error) {
     // getChat might fail if bot hasn't interacted with user
-    // This is expected and we'll fall back to placeholder
-    console.debug(`[TelegramAvatarService] getChat failed for @${username}:`, 
-      error instanceof Error ? error.message : 'Unknown error');
+    console.debug(`[TelegramAvatarService] getChat failed for @${username}`);
   }
   
   return null;
