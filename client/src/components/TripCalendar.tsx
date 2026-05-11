@@ -34,13 +34,47 @@ const monthMap: { [key: string]: number } = {
 };
 
 // Parse date string and extract start and end dates
-function parseTripDates(dateStr: string): { startDay: number; endDay: number; month: number } | null {
+// Handles formats like "20-29 марта", "7/11 сентября", "28 июня /3 июля"
+function parseTripDates(dateStr: string): { startDay: number; endDay: number; month: number }[] | null {
   if (!dateStr) return null;
 
-  const parts = dateStr.toLowerCase().split(' ');
+  const result: { startDay: number; endDay: number; month: number }[] = [];
+  const dateStr_lower = dateStr.toLowerCase();
+  
+  // Handle cross-month dates like "28 июня /3 июля" or "28 июня/3 июля"
+  // Split by "/" to check for cross-month dates
+  if (dateStr_lower.includes('/') && dateStr_lower.includes('июня') && dateStr_lower.includes('июля')) {
+    // Format: "28 июня /3 июля"
+    const parts = dateStr_lower.split('/');
+    if (parts.length === 2) {
+      // First part: "28 июня "
+      const firstMatch = parts[0].match(/(\d+)\s+(\w+)/);
+      if (firstMatch) {
+        const day1 = parseInt(firstMatch[1], 10);
+        const month1 = monthMap[firstMatch[2]];
+        if (month1) {
+          result.push({ startDay: day1, endDay: 30, month: month1 });
+        }
+      }
+      
+      // Second part: "3 июля"
+      const secondMatch = parts[1].match(/(\d+)\s+(\w+)/);
+      if (secondMatch) {
+        const day2 = parseInt(secondMatch[1], 10);
+        const month2 = monthMap[secondMatch[2]];
+        if (month2) {
+          result.push({ startDay: 1, endDay: day2, month: month2 });
+        }
+      }
+      
+      return result.length > 0 ? result : null;
+    }
+  }
+  
+  // Handle standard formats: "20-29 марта" or "7/11 сентября"
+  const parts = dateStr_lower.split(' ');
   if (parts.length < 2) return null;
 
-  // Try to parse dates like "20-29 марта" or "7/11 сентября"
   const datePart = parts[0];
   const monthPart = parts[1];
 
@@ -62,7 +96,8 @@ function parseTripDates(dateStr: string): { startDay: number; endDay: number; mo
   }
 
   if (startDay > 0 && endDay > 0) {
-    return { startDay, endDay, month };
+    result.push({ startDay, endDay, month });
+    return result;
   }
 
   return null;
@@ -96,24 +131,29 @@ export function TripCalendar({ trips, isTripsDatePassed, onDayClick }: TripCalen
     const dayToTripsMap: { [key: string]: Trip[] } = {}; // Map day to trips on that day
 
     trips.forEach(trip => {
-      const parsed = parseTripDates(trip.date);
-      if (parsed) {
-        if (!months[parsed.month]) {
-          months[parsed.month] = new Set();
-          tripsByMonth[parsed.month] = [];
-        }
-
-        // Add all days in the range
-        for (let day = parsed.startDay; day <= parsed.endDay; day++) {
-          months[parsed.month].add(day);
-          const dayKey = `${parsed.month}-${day}`;
-          if (!dayToTripsMap[dayKey]) {
-            dayToTripsMap[dayKey] = [];
+      const parsedArray = parseTripDates(trip.date);
+      if (parsedArray && parsedArray.length > 0) {
+        // Handle multiple date ranges (for cross-month trips)
+        parsedArray.forEach(parsed => {
+          if (!months[parsed.month]) {
+            months[parsed.month] = new Set();
+            tripsByMonth[parsed.month] = [];
           }
-          dayToTripsMap[dayKey].push(trip);
-        }
 
-        tripsByMonth[parsed.month].push(trip);
+          // Add all days in the range
+          for (let day = parsed.startDay; day <= parsed.endDay; day++) {
+            months[parsed.month].add(day);
+            const dayKey = `${parsed.month}-${day}`;
+            if (!dayToTripsMap[dayKey]) {
+              dayToTripsMap[dayKey] = [];
+            }
+            dayToTripsMap[dayKey].push(trip);
+          }
+
+          if (!tripsByMonth[parsed.month].includes(trip)) {
+            tripsByMonth[parsed.month].push(trip);
+          }
+        });
       }
     });
 
